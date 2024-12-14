@@ -12,6 +12,7 @@ social-transmotion/visualization/*
 *.pt
 *.pth.tar
 *.pyc
+*.DS_Store
 */__pycache__/*
 */.venv/*
 pacer/data/*
