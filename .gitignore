@@ -13,13 +13,13 @@ social-transmotion/visualization/*
 *.pth.tar
 *.pyc
 *.DS_Store
+*/__MACOSX/*
 */__pycache__/*
 */.venv/*
 pacer/data/*
 pacer/output/*
 pacer/log/*
 pacer/wandb/*
-*/__MACOSX/*
 */.DS_Store
 */.ipynb_checkpoints/*
 isaacgym/python/build/*
