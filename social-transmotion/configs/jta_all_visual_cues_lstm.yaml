@@ -1,0 +1,35 @@
+SEED: 1
+TRAIN:
+    batch_size: 13
+    epochs: 50
+    num_workers: 2
+    input_track_size: 9
+    output_track_size: 12
+    lr: 0.0001
+    lr_decay: 1
+    lr_drop: true
+    aux_weight: 0.2
+    val_frequency: 2
+    optimizer: "adam"
+    max_grad_norm: 1.0
+DATA:
+    train_datasets:
+        - jta_all_visual_cues
+    preprocessed: true
+MODEL:
+    seq_len: 453 # 1*21 + (token_num-1)*9 ,seq length for local-former, 219 for 2d/3d pose, 30 for 2d/3d bb, 21 for baseline, 228 for 3dbox+3dpose # default: 435
+    token_num: 49 # number of tokens for local-former, 22*2 for 2d/3d pose, 1*2 for 2d/3d bb, 1 for baseline # default: 47
+    num_layers_local: 6
+    num_layers_global: 3
+    num_heads: 4
+    dim_hidden: 128
+    dim_feedforward: 1024
+    type: "transmotion"
+    eval_single: false
+    output_scale: 1
+    checkpoint: "/home/halo/plausibl/social-transmotion/experiments/jta_smpl/checkpoints/best_val_checkpoint.pth.tar" ##checkpoint.pth.tar best_val_checkpoint.pth.tar
+    valuenet_checkpoint: "/home/halo/plausibl/pacer/output/exp/pacer/v4_valuenet_lr1e-4mini_valuenet.pth"
+    # valuenet_checkpoint: "/home/halo/plausibl/pacer/output/exp/pacer/v4_lr1e-4_trajonly_valuenet.pth"
+    # valuenet_checkpoint: "/home/halo/plausibl/pacer/output/exp/pacer/v4_lr1e-4_initadjust_trajonly_valuenet.pth"
+
+    # valuenet_checkpoint: "/home/halo/plausibl/pacer/output/exp/pacer/v4_valuenet_valuenet_00057000.pth"

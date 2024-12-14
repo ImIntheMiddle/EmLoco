@@ -1,0 +1,56 @@
+SEED: 2
+TRAIN:
+    batch_size: 10 # 13 at dl41, 10 at dl40 2-
+    epochs: 30
+    num_workers: 5
+    input_track_size: 9
+    output_track_size: 12
+    lr: 0.0001 # default: 0.0001
+    lr_decay: 1
+    lr_drop: true
+    aux_weight: 0.2
+    val_frequency: 2
+    optimizer: "adam"
+    max_grad_norm: 1.0
+DATA:
+    train_datasets:
+        - jta_all_visual_cues
+    preprocessed: true
+MODEL:
+    seq_len: 453 # 1*21 + (token_num-1)*9 ,seq length for local-former, 219 for 2d/3d pose, 30 for 2d/3d bb, 21 for baseline, 228 for 3dbox+3dpose # default: 435
+    # seq_len: 237 # 1*21 + (token_num-1)*9 ,seq length for local-former, 219 for 2d/3d pose, 30 for 2d/3d bb, 21 for baseline, 228 for 3dbox+3dpose # default: 435
+    # seq_len: 192 # 1*21 + (token_num-1)*9 =
+    token_num: 49 # number of tokens for local-former, 22 and 24 for 2d/3d pose, 1*2 for 2d/3d bb, 1 for baseline # default: 47
+    # token_num: 25 # number of tokens for local-former, 22 and 24 for 2d/3d pose, 1*2 for 2d/3d bb, 1 for baseline # default: 47
+    # token_num: 20 # further remove pelvis and toes
+    num_layers_local: 6 # default: 6
+    # num_layers_local: 8
+    num_layers_global: 3
+    # num_layers_global: 5 # default: 3
+    num_heads: 4 # default: 4
+    num_modes: 20
+    dim_hidden: 128
+    dim_feedforward: 1024
+    type: "transmotion"
+    eval_single: false
+    output_scale: 1
+    # checkpoint: "experiments/JTA/jta_valuenet_100/checkpoints/best_val_checkpoint.pth.tar" ##checkpoint.pth.tar best_val_checkpoint.pth.tar
+    checkpoint: "experiments/JTA/hypara_cvpr_1108new/checkpoints/best_val_0_01532.pth.tar" ##checkpoint.pth.tar best_val_checkpoint.pth.tar
+    # valuenet_checkpoint: "/misc/dl00/halo/plausibl/pacer/output/exp/pacer/valuenet_realpath_JTA+JRDB_valuenet_00025000.pth"
+    # valuenet_checkpoint: "/misc/dl00/halo/plausibl/pacer/output/exp/pacer/valuenet_realpath_JTA+JRDB_discountmaxminMSE_valuenet_00025000.pth"
+    valuenet_checkpoint: "/misc/dl00/halo/plausibl/pacer/output/exp/pacer/valuenet_1106_discount_hybrid_full_valuenet_00025000.pth" # FULL
+    # valuenet_checkpoint: "/misc/dl00/halo/plausibl/pacer/output/exp/pacer/valuenet_1106_discount_hybrid_nopose_valuenet_00025000.pth"
+    # valuenet_checkpoint: "/misc/dl00/halo/plausibl/pacer/output/exp/pacer/valuenet_1106_discount_hybrid_novel_valuenet_00025000.pth"
+    # valuenet_checkpoint: "/misc/dl00/halo/plausibl/pacer/output/exp/pacer/valuenet_1106_discount_hybrid_trajonl_valuenet_00025000.pth"
+    # valuenet_checkpoint: "/misc/dl00/halo/plausibl/pacer/output/exp/pacer/valuenet_1106_discount_align_realpathonly_valuenet_00025000.pth"
+    # valuenet_checkpoint: "/misc/dl00/halo/plausibl/pacer/output/exp/pacer/valuenet_hybrid_JTAonly_valuenet_00025000.pth"
+    # valuenet_checkpoint: "/misc/dl00/halo/plausibl/pacer/output/exp/pacer/valuenet_realpath_JTAtest_valuenet_00025000.pth"
+    # valuenet_checkpoint: "/misc/dl00/halo/plausibl/pacer/output/exp/pacer/valuenet_realpath_power4x_valuenet_00025000.pth"
+    # valuenet_checkpoint: "/misc/dl00/halo/plausibl/pacer/output/exp/pacer/valuenet_hybrid_JTA+JRDB_power4x_valuenet_00025000.pth"
+    # valuenet_checkpoint: "/misc/dl00/halo/plausibl/pacer/output/exp/pacer/valuenet_hybrid_noalign_valuenet_00025000.pth"
+    # valuenet_checkpoint: "/misc/dl00/halo/plausibl/pacer/output/exp/pacer/valuenet_realpath_JTA+JRDB_random_noalign_valuenet_00025000.pth"
+    # valuenet_checkpoint: "/misc/dl00/halo/plausibl/pacer/output/exp/pacer/valuenet_random_noalign_valuenet_00025000.pth"
+    # valuenet_checkpoint: "/misc/dl00/halo/plausibl/pacer/output/exp/pacer/valuenet_realpath_JTAhybrid_noalign_valuenet_00025000.pth"
+    # valuenet_checkpoint: "/misc/dl00/halo/plausibl/pacer/output/exp/pacer/valuenet_realpath_JTA+JRDBonly_noalign_valuenet_00025000.pth"
+    # valuenet_checkpoint: "/misc/dl00/halo/plausibl/pacer/output/exp/pacer/valuenet_realpath_JTA+JRDB_align_valuenet_00025000.pth"
+    # valuenet_checkpoint: "/misc/dl00/halo/plausibl/pacer/output/exp/pacer/valuenet_realpath_JTA+JRDB_novel_valuenet_00025000.pth"

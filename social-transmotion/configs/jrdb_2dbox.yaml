@@ -1,0 +1,31 @@
+SEED: 0
+TRAIN:
+    batch_size: 20 # 100 on dl41
+    epochs: 150
+    num_workers: 3
+    input_track_size: 9
+    output_track_size: 12
+    lr: 0.0001
+    lr_decay: 1
+    lr_drop: true
+    aux_weight: 0.2
+    val_frequency: 2
+    optimizer: "adam"
+    max_grad_norm: 1.0
+DATA:
+    train_datasets:
+        - jrdb_2dbox
+    preprocessed: true
+MODEL:
+    seq_len: 246 # default: 30
+    token_num: 26 # default: 2
+    num_layers_local: 6
+    num_layers_global: 3
+    num_heads: 4
+    dim_hidden: 128
+    dim_feedforward: 1024
+    type: "transmotion"
+    eval_single: false
+    output_scale: 1
+    checkpoint: ""
+    valuenet_checkpoint: ""

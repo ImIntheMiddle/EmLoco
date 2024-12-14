@@ -1,0 +1,38 @@
+SEED: 0
+TRAIN:
+    batch_size: 200 # 13 at dl41, 
+    epochs: 20
+    num_workers: 5
+    input_track_size: 9
+    output_track_size: 12
+    lr: 0.005
+    lr_decay: 1
+    lr_drop: true
+    weight_decay: 0.0001
+    aux_weight: 0.2
+    val_frequency: 2
+    optimizer: "adam"
+    max_grad_norm: 1.0
+DATA:
+    train_datasets:
+        - jta_all_visual_cues
+    preprocessed: true
+MODEL:
+    pool: "social" # type of interaction encoder
+    token_num: 49 # number of tokens for local-former, 22*2 for 2d/3d pose, 1*2 for 2d/3d bb, 1 for baseline # default: 47
+    hidden-dim: 16 # LSTM hidden dimension
+    coordinate-embedding-dim: 64 # coordinate embedding dimension
+    goal_flag: false #
+    goal_dim: 64 # goal embedding dimension
+    cell_side: 0.6 # cell size of real world (in m) for grid-based pooling
+    n: 10 # number of cells per side for grid-based pooling
+    front: false # flag to only consider pedestrian in front during grid-based pooling
+    out_dim: 32 # output dimension of interaction vector
+    embedding_arch: "one_layer" # interaction encoding arch for gridbased pooling
+    constant: 0 # int: background value (when cell empty) of gridbased pooling
+    norm: 0 # int: normalization scheme of input batch during grid-based pooling
+    layer_dims: [1024] # list of int: hidden dimensions of interaction module layer dims for grid-based pooling
+    latent_dim: 16 # int: latent dimension of encoding hidden dimension during social pooling
+
+    checkpoint: "" ##checkpoint.pth.tar best_val_checkpoint.pth.tar
+    valuenet_checkpoint: "valuenet_realpath_JTA+JRDB_valuenet_00025000.pth"

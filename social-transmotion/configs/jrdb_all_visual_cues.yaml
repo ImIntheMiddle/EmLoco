@@ -1,0 +1,43 @@
+SEED: 0
+TRAIN:
+    batch_size: 20 # 28 on dl41, 46 on dl40 0-1
+    epochs: 100
+    num_workers: 5
+    input_track_size: 9
+    output_track_size: 12
+    lr: 0.0001
+    lr_decay: 1
+    lr_drop: true
+    aux_weight: 0.2
+    val_frequency: 2
+    optimizer: "adam"
+    max_grad_norm: 1.0
+DATA:
+    train_datasets:
+        - jrdb_all_visual_cues
+    preprocessed: true
+MODEL:
+    seq_len: 246 # 1*21 + (token_num-1)*9 # default: 30
+    # seq_len: 237 # 1*21 + (token_num-1)*9 # default: 30
+    # seq_len: 192 # 1*21 + (token_num-1)*9 # default: 30
+    token_num: 26 # number of tokens for local-former, 24 for 3d pose, 1 for 2d bb, 1 for baseline # default: 2
+    # token_num: 25 # number of tokens for local-former, 24 for 3d pose, 1 for baseline # default: 2
+    # token_num: 20 # number of tokens for local-former, 24 for 3d pose, 1 for baseline # default: 2
+    num_layers_local: 6
+    num_layers_global: 3
+    num_heads: 4
+    num_modes: 20
+    dim_hidden: 128
+    dim_feedforward: 1024
+    type: "transmotion"
+    eval_single: false
+    output_scale: 1
+    checkpoint: "experiments/JRDB/jrdb_standard_filterv2/checkpoints/best_val_checkpoint_121epoch.pth.tar"
+    # valuenet_checkpoint: "/home/halo/plausibl/pacer/output/exp/pacer/valuenet_realpath_JTA+JRDB_valuenet_00025000.pth"
+    # valuenet_checkpoint: "/home/halo/plausibl/pacer/output/exp/pacer/valuenet_hybrid_JRDBonly_valuenet_00025000.pth"
+    # valuenet_checkpoint: "/misc/dl00/halo/plausibl/pacer/output/exp/pacer/valuenet_realpath_JTA+JRDB_discountmaxminMSE_valuenet_00025000.pth"
+    valuenet_checkpoint: "/misc/dl00/halo/plausibl/pacer/output/exp/pacer/valuenet_1106_discount_hybrid_full_valuenet_00025000.pth"
+    # valuenet_checkpoint: "/misc/dl00/halo/plausibl/pacer/output/exp/pacer/valuenet_1106_discount_hybrid_nopose_valuenet_00025000.pth"
+    # valuenet_checkpoint: "/misc/dl00/halo/plausibl/pacer/output/exp/pacer/valuenet_1106_discount_hybrid_novel_valuenet_00025000.pth"
+    # valuenet_checkpoint: "/misc/dl00/halo/plausibl/pacer/output/exp/pacer/valuenet_1106_discount_hybrid_trajonl_valuenet_00025000.pth"
+    # valuenet_checkpoint: "/misc/dl00/halo/plausibl/pacer/output/exp/pacer/valuenet_1106_discount_align_realpathonly_valuenet_00025000.pth"

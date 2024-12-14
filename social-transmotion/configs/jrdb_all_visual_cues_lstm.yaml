@@ -1,0 +1,31 @@
+SEED: 0
+TRAIN:
+    batch_size: 20 # 100 on dl41
+    epochs: 150
+    num_workers: 3
+    input_track_size: 9
+    output_track_size: 12
+    lr: 0.0001
+    lr_decay: 1
+    lr_drop: true
+    aux_weight: 0.2
+    val_frequency: 2
+    optimizer: "adam"
+    max_grad_norm: 1.0
+DATA:
+    train_datasets:
+        - jrdb_all_visual_cues
+    preprocessed: true
+MODEL:
+    seq_len: 246 # 1*21 + (token_num-1)*9 # default: 30
+    token_num: 26 # number of tokens for local-former, 24 for 3d pose, 1 for 2d bb, 1 for baseline # default: 2
+    num_layers_local: 6
+    num_layers_global: 3
+    num_heads: 4
+    dim_hidden: 128
+    dim_feedforward: 1024
+    type: "transmotion"
+    eval_single: false
+    output_scale: 1
+    checkpoint: ""
+    valuenet_checkpoint: "/home/halo/plausibl/pacer/output/exp/pacer/v4_valuenet_lr1e-4mini_valuenet.pth"
