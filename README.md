@@ -12,7 +12,7 @@
 > [!Important]
 > This repo’s in progress — hope you stay tuned!
 > 
-> ✅ToDo:
+> ✅ToDos:
 > - [x] Release the paper on arXiv: [arXiv](https://arxiv.org/abs/2503.17267)
 > - [x] Release a project page: [Project page](https://iminthemiddle.github.io/EmLoco-Page/#)
 > - [x] Release this codebase
@@ -28,24 +28,22 @@
 > - Python 3.10.7
 > - CUDA 12.1
 > Other versions have not been tested.
-- Create and activate a virtual environment for this repository.
-- Following the command below, please install the required packages:
-    ```
-    pip install -r requirement.txt
-    ```
-- Then, you can set up your environment by following:
-    ```
-    python setup.py build develop --user
-    ```
+
+1. Please follow the instruction of [PACER](https://github.com/nv-tlabs/pacer) and set up [IsaacGym](https://developer.nvidia.com/isaac-gym).
+2. Please follow the instruction of [Social-Transmotion](https://github.com/vita-epfl/social-transmotion) and download [JTA](https://github.com/fabbrimatteo/JTA-Dataset) and [JRDB](https://github.com/vita-epfl/JRDB-Traj) datasets.
+3. Please follow the instruction of [Pose to SMPL](https://github.com/Dou-Yiming/Pose_to_SMPL) (no need to download datasets other than above).
+4. Please download the Preprocessed Keypoints from [human-scene-transformer](https://github.com/google-research/human-scene-transformer/tree/main/human_scene_transformer/data).
+- In my case, different virtual environments are used for each of PACER, Socal-Transmotion, and Pose to SMPL.
     
 ## 🌐Data Preparation
-
+**Coming soon!**
 
 ## 🚀Quick Start
-- Make sure you are in the root directory.
-- You can execute **VATL (Video-specific Active Transfer Learning)** by following commands.
+<details><summary><bold>LocoVal function training in a physics simulator</bold></summary>
 
-<details><summary><bold>VATL on PoseTrack21 using SimpleBaseline</bold></summary>
+</details>
+
+<details><summary><bold>Human trajectory prediction using EmLoco loss and LocoVal filter</bold></summary>
     
 1. **(Optional) Train an initial pose estimator from scratch**
     ```
@@ -61,22 +59,15 @@
     ```
 4. **Execute Video-specific Active Transfer Learning on test videos**
 
-    > **Warning**
-    > Please specify the detailed settings in the shell script if you like.
     ```
     bash ./scripts/run_active_learning.sh ${GPU_ID}
     ```
 5. **Evaluate the results of video-specific ATL**
 
-    > **Warning**
-    > Please specify the results to summarize in the Python script.
     ```
     python ./scripts/detailed_result.py
     ```
 6. **(Optional) Visualize the estimated poses on each ATL cycle**
-
-    > **Warning**
-    > Please specify the results to summarize in the Python script.
     ```
     python ./scripts/visualize_result.py
     ```
@@ -96,7 +87,7 @@
 ## 🤗Acknowledgement
 This project repository builds upon the shoulders of giants.
 Huge thanks to these awesome works!
-- [JTA-Dataset](https://github.com/fabbrimatteo/JTA-Dataset) and [JRDB-Traj](https://github.com/vita-epfl/JRDB-Traj) for datasets.
 - [PACER](https://github.com/nv-tlabs/pacer) and [IsaacGymEnvs](https://github.com/isaac-sim/IsaacGymEnvs) for locomotion generation in physics-simulator.
 - [Social-Transmotion](https://github.com/vita-epfl/social-transmotion) and [EqMotion](https://github.com/MediaBrain-SJTU/EqMotion) for trajectory prediction.
-- [Pose to SMPL](https://github.com/Dou-Yiming/Pose_to_SMPL) for SMPL pose conversion.
+- [JTA-Dataset](https://github.com/fabbrimatteo/JTA-Dataset) and [JRDB-Traj](https://github.com/vita-epfl/JRDB-Traj) for datasets.
+- [Pose to SMPL](https://github.com/Dou-Yiming/Pose_to_SMPL) and [human-scene-transformer](https://github.com/google-research/human-scene-transformer/tree/main/human_scene_transformer/data) for SMPL pose conversion.
