@@ -76,8 +76,9 @@
     - Also, you can save the prediction results for visualization by adding "--vis".
 4. **(Optional) Visualize the prediction results**
     ```
-    python visualize_pred.py
+    python visualize_pred.py --save_name ANY_SAVE_NAME
     ```
+    - You can specify the prediction results to visualize by "paths" in the script.
 
 ## 🔍Citation
 **If you found this code useful, please consider citing our work ;D**
