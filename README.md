@@ -14,7 +14,7 @@
 
 ## ⬇️Installation
 > **Warning**
-> Environment: Python 3.10.7, CUDA 11.3, PyTorch 1.12.1
+> Environment: Python 3.10.7, CUDA 12.1
 > 
 > Other versions have not been tested.
 - Create and activate a virtual environment for this repository.
