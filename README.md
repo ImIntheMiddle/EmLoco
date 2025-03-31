@@ -6,7 +6,7 @@
 >   - [arXiv](https://arxiv.org/abs/2503.17267)
 
 <div align="center">
-    <img src=".github/overview.png", width="960">
+    <img src=".github/plausibility_evaluation.png", width="960">
 </div>
 
 ## 📑Abstract
