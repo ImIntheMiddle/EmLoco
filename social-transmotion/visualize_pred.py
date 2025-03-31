@@ -19,7 +19,6 @@ class CompareVis_3D(Visualizer_3D):
         fig = plt.figure()
         fig, ax = self.plot_3d(fig, gt_xy, preds, past_xy, init_pose, id_b, id_k, ades, values, names, past_len=past_len)
         # save plot
-        # 余白を入れる
         plt.savefig(os.path.join(self.save_dir, f"batch{id_b}_person{id_k}.png"), bbox_inches="tight")
         # plt.savefig(os.path.join(self.save_dir, f"batch{id_b}_person{id_k}.pdf"), bbox_inches="tight")
         plt.close(fig)
@@ -71,7 +70,6 @@ def main(data, save_dir, frame_num):
         vis_dict[id]['ades'] = ades
         vis_dict[id]['values'] =values
         # vis.save_plot(gt_xy, preds, past_xy, init_pose, id_b, id_k, ades, values, names, past_len=frame_num)
-        # if (ades[0] < ades[2]) and (ades[1] < ades[2]):
     # save the visualization dictionary
     with open(os.path.join(save_dir, 'vis_dict.pkl'), 'wb') as f:
         pickle.dump(vis_dict, f)
@@ -84,7 +82,6 @@ def use_vis_dict(data, save_dir, frame_num, picked_sample=[]):
     initial_iter = True if len(picked_sample)==0 else False
     # open pre-saved vis_dict
     # import pdb; pdb.set_trace()
-    # save_dir = os.path.join(args.base_dict, 'JTA_CoRL', f"{frame_num}frame")
     vis_dict = pickle.load(open(os.path.join(save_dir, 'vis_dict.pkl'), 'rb'))
     bar = tqdm.tqdm(vis_dict.keys(), desc="Comparing data", dynamic_ncols=True)
     for id in bar:
@@ -98,20 +95,8 @@ def use_vis_dict(data, save_dir, frame_num, picked_sample=[]):
         preds = vis_dict[id]['preds']
         ades = vis_dict[id]['ades']
         values = vis_dict[id]['values']
-        # if ((frame_num==1) and (ades[2]+1 < ades[0]) and (ades[2]+0.5 < ades[1]) and (ades[1]+1 < ades[0]) and (ades[2] < 1.2)) or ((frame_num==9) and (ades[2] < 0.5) and (ades[1]<ades[0]) and (ades[2]<ades[0]) and (ades[2]<ades[1])):
-        # if ades[1] < ades[0]:
-        # if id_b == 4 and id_k == 18:
-        # if id_b == 6 and id_k == 11:
-            # if initial_iter:
-            #     picked_sample.append((id_b, id_k))
-            # elif (id_b, id_k) not in picked_sample:
-            #     continue
+
         # import pdb; pdb.set_trace()
-        # if (ades[1]+0.5 < ades[0]) and (ades[1] < 3):
-        # if (ades[0] < 2) and (max(values[0][0])>0.7) and (min(values[0][0])<0.5):
-        # if id_b==3 and id_k==51:
-            # print(values[0])
-        # if id_b==15 and id_k==99:
         if (ades[0]>ades[1]):
             vis.save_plot(gt_xy, preds, past_xy, init_pose, id_b, id_k, ades, values, names, past_len=frame_num)
     return picked_sample
@@ -124,49 +109,7 @@ if __name__ == "__main__":
     parser.add_argument("--frame_num", type=int, default=9)
     args = parser.parse_args()
 
-    # paths = { # PRMUv1
-        # '(i) Baseline (Traj)': ['jta_smpl', 'train', 'traj'],
-        # '(ii) Baseline (Traj+Pose)': ['jta_smpl', 'train', 'traj+all'],
-        # '(iii) Ours (Traj+Pose)': ['valuenet_finetune', 'train', 'traj+all'],
-    # }
-    # paths = { # CoRL
-    #     '(i) Baseline (Traj.)': ['JTA/jta_st_standard', 'traj'],
-    #     '(ii) Baseline (All)': ['JTA/jta_st_standard', 'traj+all'],
-    #     '(iii) Ours (All)': ['JTA/jta_valuenet_100', 'traj+all'],
-    # }
-    # paths = { # PRMU
-        # '(i) Baseline (Traj.)': ['JRDB/standard_st_v1filter', 'traj'],
-        # '(ii) Baseline (Traj. + 3D Pose)': ['JRDB/standard_st_v1filter', 'traj+3dpose'],
-        # '(iii) Ours (Traj. + 3D Pose)': ['JRDB/valuenet120_v1filter', 'traj+3dpose'],
-    # }
-    paths = { # CoRL
-        '(i) Social-Trans (Traj.)': ['JRDB/jrdb_standard_v4', 'traj'],
-        '(ii) Social-Trans': ['JRDB/jrdb_standard_v4', 'traj+all'],
-        '(iii) Ours': ['JRDB/jrdb_discount_1101_value100', 'traj+all'],
-    }
-    # paths = { # CoRL
-        # 'Social-Trans': ['JRDB/jrdb_discount_nonnorm_standard_5heads_1112', 'traj+all'],
-        # 'Ours': ['JRDB/jrdb_multimodal_5heads_value100', 'traj+all'],
-    # }
-
-    # paths = {
-        # '(i) Baseline (All)': ['JTA/jta_multimodal_5heads_standard', 'traj+all/valuenet_realpath_JTA+JRDB_valuenet_00025000'],
-        # '(ii) Ours (All)': ['JTA/jta_multimodal_5heads_value100', 'traj+all'],
-    # }
-
-    # paths = { # CVPR
-    #     '(i) Social-Trans (Traj.)': ['JTA/jta_discount_3dnonnorm_1104_standard', 'traj'],
-    #     '(ii) Social-Trans': ['JTA/jta_discount_3dnonnorm_1104_standard', 'traj+all'],
-    #     # '(iii) Ours': ['JTA/jta_discount_3dnonnorm_1104_value100', 'traj+all/valuenet_1106_discount_hybrid_full_valuenet_00025000'],
-    #     '(iii) Ours': ['JTA/jta_discount_3dnonnorm_1104_value100', 'traj+all'],
-    # }
-
-    # paths = { # CVPR
-        # 'Social-Trans': ['JTA/jta_discount_nonnorm_standard_5heads_1110', 'traj+all/valuenet_1106_discount_hybrid_full_valuenet_00025000'],
-    #     # '(ii) Social-Trans': ['JTA/jta_discount_3dnonnorm_1104_standard', 'traj+all'],
-    #     # '(iii) Ours': ['JTA/jta_discount_3dnonnorm_1104_value100', 'traj+all/valuenet_1106_discount_hybrid_full_valuenet_00025000'],
-        # 'Ours': ['JTA/jta_discount_nonnorm_value100_5heads_1110', 'traj+all/valuenet_1106_discount_hybrid_full_valuenet_00025000'],
-    # }
+    # paths = {} # please specify the results to visualize
 
     picked_sample = [] # initialize picked sample
     for frame_num in [2]:
