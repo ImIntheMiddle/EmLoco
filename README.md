@@ -1,21 +1,32 @@
-# 🚶‍➡️[EmLoco](https://iminthemiddle.github.io/EmLoco-Page/#)🏃‍➡️
+<div align="center">
+    <img src="overview.png", width="960">
+</div>
 
-> This is an implementation of the paper: **Physical Plausibility-aware Trajectory Prediction via Locomotion Embodiment (CVPR2025 main)**
+# 🚶‍➡️[EmLoco](https://iminthemiddle.github.io/EmLoco-Page/#)🏃‍➡️
+> [!Note]
+> This is an implementation of the paper: **Physical Plausibility-aware Trajectory Prediction via Locomotion Embodiment (CVPR2025 main).**
 >   - Author: [Hiromu Taketsugu](https://iminthemiddle.github.io/), [Takeru Oba](https://obat2343.wixsite.com/my-site), [Takahiro Maeda](https://meaten.github.io/), [Shohei Nobuhara](https://shohei.nobuhara.org/index.en.html), [Norimichi Ukita](https://www.toyota-ti.ac.jp/Lab/Denshi/iim/ukita/index.html)
 >   - [Project page](https://iminthemiddle.github.io/EmLoco-Page/#)
 >   - [arXiv](https://arxiv.org/abs/2503.17267)
 
-<div align="center">
-    <img src=".github/plausibility_evaluation.png", width="960">
-</div>
+> [!Important]
+> This repo’s in progress — hope you stay tuned!
+> 
+> ✅ToDo:
+> - [x] Release the paper on arXiv: [arXiv](https://arxiv.org/abs/2503.17267)
+> - [x] Release a project page: [Project page](https://iminthemiddle.github.io/EmLoco-Page/#)
+> - [x] Release this codebase
+> - [ ] Provide the pre-trained models
+> - [ ] Provide the instruction and processed files for pose conversion
+> - [ ] Add a link to CVF Open Access Repository
 
 ## 📑Abstract
 *Humans can predict future human trajectories even from momentary observations by using human pose-related cues. However, previous **Human Trajectory Prediction (HTP)** methods leverage the pose cues implicitly, resulting in implausible predictions. To address this, we propose **Locomotion Embodiment**, a framework that explicitly evaluates the physical plausibility of the predicted trajectory by locomotion generation under the laws of physics. While the plausibility of locomotion is learned with an indifferentiable physics simulator, it is replaced by our differentiable **Locomotion Value function** to train an HTP network in a data-driven manner. In particular, our proposed **Embodied Locomotion loss** is beneficial for efficiently training a stochastic HTP network using multiple heads. Furthermore, the **Locomotion Value filter** is proposed to filter out implausible trajectories at inference. Experiments demonstrate that our method further enhances even the state-of-the-art HTP methods across diverse datasets and problem settings.*
 
 ## ⬇️Installation
-> **Warning**
-> Environment: Python 3.10.7, CUDA 12.1
-> 
+> [!Note]
+> - Python 3.10.7
+> - CUDA 12.1
 > Other versions have not been tested.
 - Create and activate a virtual environment for this repository.
 - Following the command below, please install the required packages:
@@ -27,30 +38,8 @@
     python setup.py build develop --user
     ```
     
-## 🌐Downloads
-- Please download PoseTrack21 and JRDB-Pose, and place them under the `./data` directory.
-    - PoseTrack21: https://github.com/anDoer/PoseTrack21
-    - JRDB-Pose: https://jrdb.erc.monash.edu/dataset/pose
-- After downloading, you can prepare annotation files as follows (please specify the mode in each script):
+## 🌐Data Preparation
 
-<details><summary>PoseTrack21</summary>
-
-```
-python ./data/PoseTrack21/make_new_annotation.py
-python ./data/PoseTrack21/integrate_new_annotation.py
-```
-</details>
-
-<details><summary>JRDB-Pose</summary>
-    
-```
-python ./data/jrdb-pose/make_new_annotation.py
-python ./data/jrdb-pose/integrate_new_annotation.py
-```
-</details>
-
-- You can download pretrained models of Human Pose Estimator (HRNet, FastPose and SimpleBaseline) and our Wholebody Auto-Encoder from Releases ``Pretrained models''.
-    - Unzip and place the ``pretrained_models'' directory under the root directory of the repository.
 
 ## 🚀Quick Start
 - Make sure you are in the root directory.
