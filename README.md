@@ -53,7 +53,7 @@
     ```
 2. **Train the Locomotion Value function**
     ```
-    python pacer/run.py --pipeline=gpu --random_heading --init_heading --adjust_root_vel --num_envs NUM_ENVS --real_path JTA+JRDB --experiment ANY_EXP_NAME
+    python pacer/run.py --pipeline=gpu --random_heading --num_envs NUM_ENVS --load_path PATH_TO_POLICY_WEIGHT --real_path JTA+JRDB --input_init_pose --input_init_vel --experiment ANY_NAME_FOR_VALUENET_PATH
     ```
 
 <summary><bold>Human trajectory prediction using EmLoco loss and LocoVal filter</bold></summary>
