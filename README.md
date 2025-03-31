@@ -36,42 +36,44 @@
 - In my case, different virtual environments are used for each of PACER, Socal-Transmotion, and Pose to SMPL.
     
 ## 🌐Data Preparation
+> [!Warning]
+> These processes should be done in the Pose to SMPL environment.
+
 **Coming soon!**
 
 ## 🚀Quick Start
-<details><summary><bold>LocoVal function training in a physics simulator</bold></summary>
+<summary><bold>LocoVal function training in a physics simulator</bold></summary>
 
-</details>
-
-<details><summary><bold>Human trajectory prediction using EmLoco loss and LocoVal filter</bold></summary>
+> [!Warning]
+> These processes should be done in the PACER environment.
     
-1. **(Optional) Train an initial pose estimator from scratch**
+1. **Pretrain the locomotion generation policy network**
     ```
     python ./scripts/posetrack_train.py --cfg ./configs/posetrack21/{CONFIG_FILE} --exp-id {EXP_ID}
     ```
-2. **(Optional) Evaluate the performance of the pre-trained model on train/val/test split**
+2. **Train the Locomotion Value function**
+    ```
+    python ./scripts/posetrack_train.py --cfg ./configs/posetrack21/{CONFIG_FILE} --exp-id {EXP_ID}
+    ```
+
+<summary><bold>Human trajectory prediction using EmLoco loss and LocoVal filter</bold></summary>
+
+> [!Warning]
+> These processes should be done in the Social-Transmotion environment.
+> If you want to train/evaluate in the JRDB dataset, you just need to replace "jta" with "jrdb".
+
+1. **Train the Social-Transmotion with the EmLoco loss**
+    ```
+    python 
+    ```
+2. **Evaluate the trained Social-Transmotion**
     ```
     python ./scripts/poseestimatoreval.py --cfg ./configs/posetrack21/{CONFIG_FILE} --exp-id {EXP_ID}
     ```
-3. **(Optional) Pre-train the AutoEncoder for WPU (Whole-body Pose Unnaturalness)**
-    ```
-    python ./scripts/wholebodyAE_train --dataset_type Posetrack21
-    ```
-4. **Execute Video-specific Active Transfer Learning on test videos**
-
-    ```
-    bash ./scripts/run_active_learning.sh ${GPU_ID}
-    ```
-5. **Evaluate the results of video-specific ATL**
-
-    ```
-    python ./scripts/detailed_result.py
-    ```
-6. **(Optional) Visualize the estimated poses on each ATL cycle**
+3. **(Optional) Visualize the prediction results**
     ```
     python ./scripts/visualize_result.py
     ```
-</details>
 
 ## 🔍Citation
 **If you found this code useful, please consider citing our work ;D**
