@@ -49,11 +49,11 @@
     
 1. **Pretrain the locomotion generation policy network**
     ```
-    python ./scripts/posetrack_train.py --cfg ./configs/posetrack21/{CONFIG_FILE} --exp-id {EXP_ID}
+    python pacer/run.py --pipeline=gpu --random_heading --init_heading --adjust_root_vel --num_envs NUM_ENVS --real_path JTA+JRDB --experiment ANY_EXP_NAME
     ```
 2. **Train the Locomotion Value function**
     ```
-    python ./scripts/posetrack_train.py --cfg ./configs/posetrack21/{CONFIG_FILE} --exp-id {EXP_ID}
+    python pacer/run.py --pipeline=gpu --random_heading --init_heading --adjust_root_vel --num_envs NUM_ENVS --real_path JTA+JRDB --experiment ANY_EXP_NAME
     ```
 
 <summary><bold>Human trajectory prediction using EmLoco loss and LocoVal filter</bold></summary>
