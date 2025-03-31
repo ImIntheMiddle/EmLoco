@@ -64,15 +64,19 @@
 
 1. **Train the Social-Transmotion with the EmLoco loss**
     ```
-    python 
+    python train_jta.py --exp_name ANY_EXP_NAME --valueloss_w ANY_WEIGHT
     ```
-2. **Evaluate the trained Social-Transmotion**
+    - If you want to train the multi-head predictor, please add "--multi_modal" and specify the number of modes in the config file.
+    - Also, you can specify the weight of the LocoVal function in the config file.
+3. **Evaluate the trained Social-Transmotion**
     ```
-    python ./scripts/poseestimatoreval.py --cfg ./configs/posetrack21/{CONFIG_FILE} --exp-id {EXP_ID}
+    python evaluate_jta.py --exp_name ANY_EXP_NAME
     ```
-3. **(Optional) Visualize the prediction results**
+    - If you want to test the multi-head predictor, please add "--multi_modal".
+    - Also, you can save the prediction results for visualization by adding "--vis".
+4. **(Optional) Visualize the prediction results**
     ```
-    python ./scripts/visualize_result.py
+    python visualize_pred.py
     ```
 
 ## 🔍Citation
