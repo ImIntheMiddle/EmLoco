@@ -7,7 +7,9 @@
 > This is an implementation of the paper: **Physical Plausibility-aware Trajectory Prediction via Locomotion Embodiment (CVPR2025 main).**
 >   - Author: [Hiromu Taketsugu](https://iminthemiddle.github.io/), [Takeru Oba](https://obat2343.wixsite.com/my-site), [Takahiro Maeda](https://meaten.github.io/), [Shohei Nobuhara](https://shohei.nobuhara.org/index.en.html), [Norimichi Ukita](https://www.toyota-ti.ac.jp/Lab/Denshi/iim/ukita/index.html)
 >   - [Project page](https://iminthemiddle.github.io/EmLoco-Page/#)
+>   - [CVF Open Access](https://openaccess.thecvf.com/content/CVPR2025/html/Taketsugu_Physical_Plausibility-aware_Trajectory_Prediction_via_Locomotion_Embodiment_CVPR_2025_paper.html)
 >   - [arXiv](https://arxiv.org/abs/2503.17267)
+>   - [YouTube](https://youtu.be/OYLDYinc9DU?si=ztusWEL1M7qB21UI)
 
 > [!Important]
 > This repo’s in progress — hope you stay tuned!
@@ -16,9 +18,9 @@
 > - [x] Release the paper on arXiv: [arXiv](https://arxiv.org/abs/2503.17267)
 > - [x] Release a project page: [Project page](https://iminthemiddle.github.io/EmLoco-Page/#)
 > - [x] Release this codebase
-> - [ ] Provide the pre-trained models
+> - [x] Provide the pre-trained models
+> - [x] Add a link to CVF Open Access Repository
 > - [ ] Provide the instruction and processed files for pose conversion
-> - [ ] Add a link to CVF Open Access Repository
 
 ## 📑Abstract
 *Humans can predict future human trajectories even from momentary observations by using human pose-related cues. However, previous **Human Trajectory Prediction (HTP)** methods leverage the pose cues implicitly, resulting in implausible predictions. To address this, we propose **Locomotion Embodiment**, a framework that explicitly evaluates the physical plausibility of the predicted trajectory by locomotion generation under the laws of physics. While the plausibility of locomotion is learned with an indifferentiable physics simulator, it is replaced by our differentiable **Locomotion Value function** to train an HTP network in a data-driven manner. In particular, our proposed **Embodied Locomotion loss** is beneficial for efficiently training a stochastic HTP network using multiple heads. Furthermore, the **Locomotion Value filter** is proposed to filter out implausible trajectories at inference. Experiments demonstrate that our method further enhances even the state-of-the-art HTP methods across diverse datasets and problem settings.*
@@ -33,7 +35,7 @@
 2. Please follow the instruction of [Social-Transmotion](https://github.com/vita-epfl/social-transmotion) and download [JTA](https://github.com/fabbrimatteo/JTA-Dataset) and [JRDB](https://github.com/vita-epfl/JRDB-Traj) datasets.
 3. Please follow the instruction of [Pose to SMPL](https://github.com/Dou-Yiming/Pose_to_SMPL) (no need to download datasets other than above).
 4. Please download the Preprocessed Keypoints from [human-scene-transformer](https://github.com/google-research/human-scene-transformer/tree/main/human_scene_transformer/data).
-- In my case, different virtual environments are used for each of PACER, Socal-Transmotion, and Pose to SMPL.
+- In my case, different virtual environments are used for each PACER, Socal-Transmotion, and Pose to SMPL.
     
 ## 🌐Data Preparation
 > [!Warning]
