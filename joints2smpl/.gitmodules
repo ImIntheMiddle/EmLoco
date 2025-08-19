@@ -1,0 +1,3 @@
+[submodule "smpllayer"]
+	path = smpllayer
+	url = https://github.com/gulvarol/smplpytorch.git

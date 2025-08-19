@@ -1,0 +1,39 @@
+{
+    "MODEL": {
+        "GENDER": "neutral"
+    },
+    "TRAIN": {
+        "LEARNING_RATE": 1e-2,
+        "MAX_EPOCH": 1000,
+        "WRITE": 10,
+        "OPTIMIZE_SCALE":0,
+        "OPTIMIZE_SHAPE":0,
+        "BATCH_SIZE": 180
+    },
+    "USE_GPU": 1,
+    "DATASET": {
+        "NAME": "UTD-MHAD",
+        "PATH": "../../social-transmotion/data/jta_all_visual_cues/original_pose/val/",
+        "TARGET_PATH": "",
+        "DATA_MAP": [
+            [0, 15],
+            [1, 19],
+            [2, 16],
+            [3, 13],
+            [4, 20],
+            [5, 17],
+            [7, 21],
+            [8, 18],
+            [9, 11],
+            [12, 2],
+            [15, 1],
+            [16, 8],
+            [17, 4],
+            [18, 9],
+            [19, 5],
+            [20, 10],
+            [21, 6]
+        ]
+    },
+    "DEBUG": 0
+}

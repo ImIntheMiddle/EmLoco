@@ -1,0 +1,81 @@
+{
+    "MODEL": {
+        "GENDER": "neutral"
+    },
+    "TRAIN": {
+        "LEARNING_RATE": 2e-2,
+        "MAX_EPOCH": 1000,
+        "WRITE": 1,
+        "OPTIMIZE_SCALE":1,
+        "OPTIMIZE_SHAPE":0
+    },
+    "USE_GPU": 1,
+    "DATASET": {
+        "NAME": "UTD-MHAD",
+        "PATH": "../human3.6M/output",
+        "TARGET_PATH": "",
+        "DATA_MAP": [
+            [
+                0,
+                0
+            ],
+            [
+                2,
+                1
+            ],
+            [
+                5,
+                2
+            ],
+            [
+                8,
+                3
+            ],
+            [
+                1,
+                4
+            ],
+            [
+                4,
+                5
+            ],
+            [
+                7,
+                6
+            ],
+            [
+                12,
+                8
+            ],
+            [
+                13,
+                11
+            ],
+            [
+                18,
+                12
+            ],
+            [
+                20,
+                13
+            ],
+            [
+                14,
+                14
+            ],
+            [
+                19,
+                15
+            ],
+            [
+                21,
+                16
+            ],
+            [
+                9,
+                17
+            ]
+        ]
+    },
+    "DEBUG": 0
+}
