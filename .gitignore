@@ -4,6 +4,8 @@
 *.pkl
 *.gif
 *.mp4
+EqMotion/eth_ucy/data/*
+EqMotion/eth_ucy/**/*.npy
 social-transmotion/experiments/*
 social-transmotion/visualization/*
 *.zip

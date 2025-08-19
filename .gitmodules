@@ -1,0 +1,3 @@
+[submodule "multi-transmotion"]
+	path = multi-transmotion
+	url = https://github.com/vita-epfl/multi-transmotion.git
