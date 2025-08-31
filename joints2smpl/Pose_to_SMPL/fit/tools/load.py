@@ -1,0 +1,34 @@
+import scipy.io
+import numpy as np
+import json
+import pickle
+
+def load(name, path):
+    if name == 'UTD_MHAD':
+        arr = scipy.io.loadmat(path)['d_skel']
+        new_arr = np.zeros([arr.shape[2], arr.shape[0], arr.shape[1]])
+        for i in range(arr.shape[2]):
+            for j in range(arr.shape[0]):
+                for k in range(arr.shape[1]):
+                    new_arr[i][j][k] = arr[j][k][i]
+        return new_arr
+    elif name == 'HumanAct12':
+        return np.load(path, allow_pickle=True)
+    elif name == "CMU_Mocap":
+        return np.load(path, allow_pickle=True)
+    elif name == "Human3.6M":
+        return np.load(path, allow_pickle=True)[0::5] # down_sample
+    elif name == "NTU":
+        return np.load(path, allow_pickle=True)[0::2]
+    elif name == "HAA4D":
+        return np.load(path, allow_pickle=True)
+    elif name == "JTA":
+        data = np.load(path, allow_pickle=True) # load npz file. (people, frames, joints, 4)
+        return data
+    elif name == "JRDB":
+        data = np.load(path, allow_pickle=True)
+        return data
+    elif name == "VRU":
+        data = np.load(path, allow_pickle=True)
+        return data
+
