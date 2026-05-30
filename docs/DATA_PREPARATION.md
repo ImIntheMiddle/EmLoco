@@ -71,7 +71,7 @@ cd ..
 ```
 
 > [!Note]
-> Refer to the [upstream Social-Transmotion repo](https://github.com/vita-epfl/social-transmotion) for the JTA preprocessing recipe; the script in this repo is unchanged from upstream.
+> The JTA preprocessing script is not bundled here. Follow the recipe in the [upstream Social-Transmotion repo](https://github.com/vita-epfl/social-transmotion) to produce the J=49 `.pkl` shards.
 
 ### 2.2 PACER trajectory cache
 
@@ -126,11 +126,11 @@ python evaluate_jta.py --exp_name jta_ours --modality traj+all
 
 ### 3.1 Build the Social-Transmotion `.pkl` shards
 
-```bash
-cd social-transmotion
-# See upstream Social-Transmotion / JRDB-Traj repos for the recipe
-cd ..
-# Output: social-transmotion/data/jrdb_2dbox/preprocess/{train,val,test}/part_<N>.pkl
+> [!Note]
+> The JRDB preprocessing script is not bundled here. Follow the recipes in the [upstream Social-Transmotion repo](https://github.com/vita-epfl/social-transmotion) and the [JRDB-Traj](https://github.com/vita-epfl/JRDB-Traj) reference to produce the J=26 base shards (with raw JRDB scenes from [jrdb.erc.monash.edu](https://jrdb.erc.monash.edu/)).
+
+```
+# Expected output: social-transmotion/data/jrdb_2dbox/preprocess/{train,val,test}/part_<N>.pkl
 ```
 
 ### 3.2 PACER trajectory cache
