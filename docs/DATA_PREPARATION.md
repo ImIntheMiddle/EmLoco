@@ -117,7 +117,8 @@ cd ../..
 ### 2.6 Verify
 
 ```bash
-python social-transmotion/evaluate_jta.py --exp_name jta_ours --modality traj+all
+cd social-transmotion
+python evaluate_jta.py --exp_name jta_ours --modality traj+all
 # Expected: ADE ≈ 0.951, FDE ≈ 1.921
 ```
 
@@ -184,7 +185,8 @@ cd ../..
 ### 3.7 Verify
 
 ```bash
-python social-transmotion/evaluate_jrdb.py --exp_name jrdb_ours --modality traj+all
+cd social-transmotion
+python evaluate_jrdb.py --exp_name jrdb_ours --modality traj+all
 # Expected: ADE ≈ 0.369, FDE ≈ 0.724
 ```
 

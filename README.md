@@ -135,16 +135,18 @@ In short:
 ## 🚀Quick Start
 
 > [!Tip]
-> Run all commands from the repository root (`EmLoco/`). Paths in configs and argparse defaults are relative to this directory.
+> Each subproject's scripts are run from inside that subproject's directory — `social-transmotion/` for trajectory prediction, `joints2smpl/Pose_to_SMPL/` for SMPL fitting, `pacer/` for PACER training. The commands below include the appropriate `cd` step.
 
 ### A. Evaluate the released Ours checkpoint
 
 ```bash
+cd social-transmotion
+
 # JTA — expected: ADE ≈ 0.951, FDE ≈ 1.921
-python social-transmotion/evaluate_jta.py --exp_name jta_ours --modality traj+all
+python evaluate_jta.py --exp_name jta_ours --modality traj+all
 
 # JRDB — expected: ADE ≈ 0.369, FDE ≈ 0.724
-python social-transmotion/evaluate_jrdb.py --exp_name jrdb_ours --modality traj+all
+python evaluate_jrdb.py --exp_name jrdb_ours --modality traj+all
 ```
 
 (Both Ours checkpoints have `num_modes=1`, deterministic prediction; no `--multi_modal` flag needed.)
@@ -152,13 +154,15 @@ python social-transmotion/evaluate_jrdb.py --exp_name jrdb_ours --modality traj+
 ### B. Train your own model with EmLoco loss
 
 ```bash
+cd social-transmotion
+
 # JTA
-python social-transmotion/train_jta.py --exp_name jta_my_emloco --valueloss_w 1.0
-python social-transmotion/evaluate_jta.py --exp_name jta_my_emloco
+python train_jta.py --exp_name jta_my_emloco --valueloss_w 1.0
+python evaluate_jta.py --exp_name jta_my_emloco
 
 # JRDB
-python social-transmotion/train_jrdb.py --exp_name jrdb_my_emloco --valueloss_w 1.0
-python social-transmotion/evaluate_jrdb.py --exp_name jrdb_my_emloco
+python train_jrdb.py --exp_name jrdb_my_emloco --valueloss_w 1.0
+python evaluate_jrdb.py --exp_name jrdb_my_emloco
 ```
 
 Both training scripts default to using the released LocoVal value-net at `pacer/output/exp/pacer/valuenet_realpath_JTA+JRDB_valuenet_00025000.pth`. Override via the `valuenet_checkpoint` key in `social-transmotion/configs/*.yaml`.
@@ -208,15 +212,18 @@ cd ..
 ### D. Visualization
 
 ```bash
-python social-transmotion/visualize_pred.py --save_name jta_ours_vis
+cd social-transmotion
+python visualize_pred.py --save_name jta_ours_vis
 ```
 
 ## 📊Reproducing Paper Results
 
+All evaluation commands assume `cwd = social-transmotion/`.
+
 | Setting | Checkpoint | Eval command | Expected |
 |---|---|---|---|
-| JTA Ours (num_modes=1) | `jta_ours` | `python social-transmotion/evaluate_jta.py --exp_name jta_ours --modality traj+all` | ADE **0.951** / FDE **1.921** |
-| JRDB Ours (num_modes=1) | `jrdb_ours` | `python social-transmotion/evaluate_jrdb.py --exp_name jrdb_ours --modality traj+all` | ADE **0.369** / FDE **0.724** |
+| JTA Ours (num_modes=1) | `jta_ours` | `python evaluate_jta.py --exp_name jta_ours --modality traj+all` | ADE **0.951** / FDE **1.921** |
+| JRDB Ours (num_modes=1) | `jrdb_ours` | `python evaluate_jrdb.py --exp_name jrdb_ours --modality traj+all` | ADE **0.369** / FDE **0.724** |
 
 For the multi-modal Table rows (num_modes>1, LocoVal filter at inference), train your own with `--multi_modal --valueloss_w 1.0` or contact the authors for additional checkpoints.
 
