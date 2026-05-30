@@ -13,7 +13,7 @@
     "USE_GPU": 1,
     "DATASET": {
         "NAME": "UTD-MHAD",
-        "PATH": "../../plausibl/social-transmotion/data/jrdb_all_visual_cues/original_pose/test/",
+        "PATH": "../../social-transmotion/data/jrdb_all_visual_cues/original_pose/test/",
         "TARGET_PATH": "",
         "DATA_MAP": [
             [1, 23],

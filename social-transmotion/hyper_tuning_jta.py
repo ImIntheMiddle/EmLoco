@@ -1,5 +1,6 @@
 import sys
-sys.path.append("/misc/dl00/halo/plausibl/pacer/pacer")
+import os
+sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "pacer", "pacer"))
 import os
 import argparse
 import random
@@ -113,7 +114,7 @@ if __name__ == "__main__":
     parser.add_argument('--dry-run', action='store_true', help="Run just one iteration")
     parser.add_argument('--not_pose', action='store_true', help="Not using pose input for value function")
     parser.add_argument('--not_vel', action='store_true', help="Not using velocity input for value function")
-    parser.add_argument('--value_dir', type=str, default="/home/halo/plausibl/pacer/output/exp/pacer/", help="Directory to the value network checkpoint")
+    parser.add_argument('--value_dir', type=str, default="../pacer/output/exp/pacer/", help="Directory to the value network checkpoint")
     parser.add_argument('--noisy_traj', action='store_true', help="Add noise to trajectory")
     args = parser.parse_args()
 

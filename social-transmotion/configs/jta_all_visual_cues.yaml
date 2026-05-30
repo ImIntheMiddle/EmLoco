@@ -34,23 +34,5 @@ MODEL:
     type: "transmotion"
     eval_single: false
     output_scale: 1
-    # checkpoint: "experiments/JTA/jta_valuenet_100/checkpoints/best_val_checkpoint.pth.tar" ##checkpoint.pth.tar best_val_checkpoint.pth.tar
     checkpoint: "experiments/JTA/hypara_cvpr_1108new/checkpoints/best_val_0_01532.pth.tar" ##checkpoint.pth.tar best_val_checkpoint.pth.tar
-    # valuenet_checkpoint: "/misc/dl00/halo/plausibl/pacer/output/exp/pacer/valuenet_realpath_JTA+JRDB_valuenet_00025000.pth"
-    # valuenet_checkpoint: "/misc/dl00/halo/plausibl/pacer/output/exp/pacer/valuenet_realpath_JTA+JRDB_discountmaxminMSE_valuenet_00025000.pth"
-    valuenet_checkpoint: "/misc/dl00/halo/plausibl/pacer/output/exp/pacer/valuenet_1106_discount_hybrid_full_valuenet_00025000.pth" # FULL
-    # valuenet_checkpoint: "/misc/dl00/halo/plausibl/pacer/output/exp/pacer/valuenet_1106_discount_hybrid_nopose_valuenet_00025000.pth"
-    # valuenet_checkpoint: "/misc/dl00/halo/plausibl/pacer/output/exp/pacer/valuenet_1106_discount_hybrid_novel_valuenet_00025000.pth"
-    # valuenet_checkpoint: "/misc/dl00/halo/plausibl/pacer/output/exp/pacer/valuenet_1106_discount_hybrid_trajonl_valuenet_00025000.pth"
-    # valuenet_checkpoint: "/misc/dl00/halo/plausibl/pacer/output/exp/pacer/valuenet_1106_discount_align_realpathonly_valuenet_00025000.pth"
-    # valuenet_checkpoint: "/misc/dl00/halo/plausibl/pacer/output/exp/pacer/valuenet_hybrid_JTAonly_valuenet_00025000.pth"
-    # valuenet_checkpoint: "/misc/dl00/halo/plausibl/pacer/output/exp/pacer/valuenet_realpath_JTAtest_valuenet_00025000.pth"
-    # valuenet_checkpoint: "/misc/dl00/halo/plausibl/pacer/output/exp/pacer/valuenet_realpath_power4x_valuenet_00025000.pth"
-    # valuenet_checkpoint: "/misc/dl00/halo/plausibl/pacer/output/exp/pacer/valuenet_hybrid_JTA+JRDB_power4x_valuenet_00025000.pth"
-    # valuenet_checkpoint: "/misc/dl00/halo/plausibl/pacer/output/exp/pacer/valuenet_hybrid_noalign_valuenet_00025000.pth"
-    # valuenet_checkpoint: "/misc/dl00/halo/plausibl/pacer/output/exp/pacer/valuenet_realpath_JTA+JRDB_random_noalign_valuenet_00025000.pth"
-    # valuenet_checkpoint: "/misc/dl00/halo/plausibl/pacer/output/exp/pacer/valuenet_random_noalign_valuenet_00025000.pth"
-    # valuenet_checkpoint: "/misc/dl00/halo/plausibl/pacer/output/exp/pacer/valuenet_realpath_JTAhybrid_noalign_valuenet_00025000.pth"
-    # valuenet_checkpoint: "/misc/dl00/halo/plausibl/pacer/output/exp/pacer/valuenet_realpath_JTA+JRDBonly_noalign_valuenet_00025000.pth"
-    # valuenet_checkpoint: "/misc/dl00/halo/plausibl/pacer/output/exp/pacer/valuenet_realpath_JTA+JRDB_align_valuenet_00025000.pth"
-    # valuenet_checkpoint: "/misc/dl00/halo/plausibl/pacer/output/exp/pacer/valuenet_realpath_JTA+JRDB_novel_valuenet_00025000.pth"
+    valuenet_checkpoint: "../pacer/output/exp/pacer/valuenet_1106_discount_hybrid_full_valuenet_00025000.pth" # FULL

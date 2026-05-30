@@ -28,4 +28,4 @@ MODEL:
     eval_single: false
     output_scale: 1
     checkpoint: ""
-    valuenet_checkpoint: "/home/halo/plausibl/pacer/output/exp/pacer/v4_valuenet_lr1e-4mini_valuenet.pth"
+    valuenet_checkpoint: "../pacer/output/exp/pacer/v4_valuenet_lr1e-4mini_valuenet.pth"

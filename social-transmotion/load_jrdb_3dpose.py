@@ -127,6 +127,6 @@ def main(opt):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--split", type=str, default="test", help="Split to use. one of [train, test, val]")
-    parser.add_argument("--hst_dir", type=str, default="/home/halo/dataset_dl001/halo/HumanSceneTransformer/processed/labels/labels_3d_keypoints_train", help="Directory of the HST dataset.")
+    parser.add_argument("--hst_dir", type=str, default="data/jrdb/hst_labels", help="Directory of the HST dataset.")
     opt = parser.parse_args()
     main(opt)

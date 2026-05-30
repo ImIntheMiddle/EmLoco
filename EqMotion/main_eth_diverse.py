@@ -1,5 +1,6 @@
 import sys
-sys.path.append("/misc/dl00/halo/plausibl/pacer/pacer")
+import os
+sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "pacer", "pacer"))
 import argparse
 import torch
 from eth_ucy.dataloader_diverse import eth_dataset
@@ -86,7 +87,7 @@ parser.add_argument("--test",action='store_true')
 parser.add_argument("--vis",action='store_true')
 parser.add_argument("--valueloss_w", type=float, default=0)
 parser.add_argument('--value_path', type=str, default="valuenet_1106_discount_hybrid_nopose_valuenet_00025000.pth", help="Path to the value network checkpoint. For example, 'valuenet_1106_discount_hybrid_nopose_valuenet_00025000.pth'. ")
-parser.add_argument('--value_dir', type=str, default="/home/halo/plausibl/pacer/output/exp/pacer/", help="Directory to the value network checkpoint")
+parser.add_argument('--value_dir', type=str, default="../pacer/output/exp/pacer/", help="Directory to the value network checkpoint")
 time_exp_dic = {'time': 0, 'counter': 0}
 
 

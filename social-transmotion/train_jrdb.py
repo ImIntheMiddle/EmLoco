@@ -1,5 +1,6 @@
 import sys
-sys.path.append("/misc/dl00/halo/plausibl/pacer/pacer")
+import os
+sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "pacer", "pacer"))
 import argparse
 from datetime import datetime
 import numpy as np
@@ -362,7 +363,7 @@ if __name__ == "__main__":
     parser.add_argument('--limit_obs', type=int, default=0, help="Limit the number of past observations")
     parser.add_argument('--frame_mask', type=bool, default=True, help="Use frame masking")
     parser.add_argument('--value_path', type=str, default="", help="Path to the value network checkpoint. For example, 'valuenet_realpath_JTA+JRDB_valuenet_00025000.pth'. ")
-    parser.add_argument('--value_dir', type=str, default="/home/halo/plausibl/pacer/output/exp/pacer/", help="Directory to the value network checkpoint")
+    parser.add_argument('--value_dir', type=str, default="../pacer/output/exp/pacer/", help="Directory to the value network checkpoint")
     parser.add_argument('--noisy_traj', action='store_true', help="Add noise to the trajectory to mimic real data")
     parser.add_argument('--use_hypara_best', action='store_true', help="Use the best hyperparameters")
     parser.add_argument('--multi_modal', action='store_true', help="Use multimodal model")

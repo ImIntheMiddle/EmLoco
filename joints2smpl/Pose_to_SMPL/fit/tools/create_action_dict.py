@@ -51,6 +51,6 @@ def main(opt):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--action_dir", type=str, default='/misc/dl00/halo/dataset_dl001/jrdb_2022/train_dataset_with_activity/labels/labels_2d_stitched', help="Directory of the JRDB-Act dataset.")
+    parser.add_argument("--action_dir", type=str, default='data/jrdb_2022/train_dataset_with_activity/labels/labels_2d_stitched', help="Directory of the JRDB-Act dataset.")
     opt = parser.parse_args()
     main(opt)

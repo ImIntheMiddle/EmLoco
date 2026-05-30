@@ -27,9 +27,6 @@ MODEL:
     type: "transmotion"
     eval_single: false
     output_scale: 1
-    checkpoint: "/home/halo/plausibl/social-transmotion/experiments/jta_smpl/checkpoints/best_val_checkpoint.pth.tar" ##checkpoint.pth.tar best_val_checkpoint.pth.tar
-    valuenet_checkpoint: "/home/halo/plausibl/pacer/output/exp/pacer/v4_valuenet_lr1e-4mini_valuenet.pth"
-    # valuenet_checkpoint: "/home/halo/plausibl/pacer/output/exp/pacer/v4_lr1e-4_trajonly_valuenet.pth"
-    # valuenet_checkpoint: "/home/halo/plausibl/pacer/output/exp/pacer/v4_lr1e-4_initadjust_trajonly_valuenet.pth"
+    checkpoint: "social-transmotion/experiments/jta_smpl/checkpoints/best_val_checkpoint.pth.tar" ##checkpoint.pth.tar best_val_checkpoint.pth.tar
+    valuenet_checkpoint: "../pacer/output/exp/pacer/v4_valuenet_lr1e-4mini_valuenet.pth"
 
-    # valuenet_checkpoint: "/home/halo/plausibl/pacer/output/exp/pacer/v4_valuenet_valuenet_00057000.pth"
