@@ -86,15 +86,19 @@ After download, wire the assets into the expected layout via symlinks (run from 
 
 ```bash
 # Preprocessed shards (JTA J=49 .pt + JRDB J=26 .pkl, ~28 GB)
+mkdir -p social-transmotion/data/jta_all_visual_cues social-transmotion/data/jrdb_all_visual_cues
 ln -s "$PWD/.assets/preprocess_smpl_cvpr/jta_all_visual_cues" \
       social-transmotion/data/jta_all_visual_cues/preprocess_smpl_cvpr
 ln -s "$PWD/.assets/preprocess_smpl_cvpr/jrdb_all_visual_cues" \
       social-transmotion/data/jrdb_all_visual_cues/preprocess_smpl_cvpr
 
 # Ours checkpoints (num_modes=1, ~76 MB)
-mkdir -p social-transmotion/experiments/JTA social-transmotion/experiments/JRDB
-ln -s "$PWD/.assets/checkpoints/jta_ours"  social-transmotion/experiments/JTA/jta_ours
-ln -s "$PWD/.assets/checkpoints/jrdb_ours" social-transmotion/experiments/JRDB/jrdb_ours
+mkdir -p social-transmotion/experiments/JTA/jta_ours social-transmotion/experiments/JRDB/jrdb_ours
+ln -s "$PWD/.assets/checkpoints/jta_ours"  social-transmotion/experiments/JTA/jta_ours/checkpoints
+ln -s "$PWD/.assets/checkpoints/jrdb_ours" social-transmotion/experiments/JRDB/jrdb_ours/checkpoints
+
+# Action-label dictionary for per-action ADE/FDE breakdown (5.5 MB, optional)
+ln -s "$PWD/.assets/action_dict.json" joints2smpl/Pose_to_SMPL/action_dict.json
 ```
 
 Also fetch the **LocoVal value-network checkpoint** from the existing GitHub Release (small file, 28 KB plus auxiliary variants):
@@ -116,6 +120,7 @@ The default checkpoint expected by `social-transmotion/evaluate_*.py` is `pacer/
 | `checkpoints/jrdb_ours/{checkpoint.pth.tar, config.yaml}` | 38 MB | Ours JRDB model (num_modes=1, EmLoco loss, token_num=26) |
 | `preprocess_smpl_cvpr/jta_all_visual_cues/{train,val,test}/part_*.pt` | 23 GB | JTA J=49 shards, torch 2.x zip format |
 | `preprocess_smpl_cvpr/jrdb_all_visual_cues/{train,val,test}/part_*.pkl` | 4.5 GB | JRDB J=26 shards with action-aware NaN-fill on pose tokens |
+| `action_dict.json` | 5.5 MB | JRDB-Act labels for per-action ADE/FDE breakdown (optional; eval works without it) |
 
 ### Regenerating preprocessed shards from raw data (optional)
 
