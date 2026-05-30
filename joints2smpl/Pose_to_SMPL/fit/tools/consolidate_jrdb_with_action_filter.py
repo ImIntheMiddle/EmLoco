@@ -203,9 +203,9 @@ def consolidate_split(split, args, action_dict):
         grand_pose += n_pose
         grand_action += n_action
 
-        out_path = os.path.join(out_dir, part_file)
-        with open(out_path, "wb") as f:
-            pickle.dump(out_scenes, f)
+        # Save as torch .pt (matches dataset_jta.py / dataset_jrdb.py loader convention).
+        out_path = os.path.join(out_dir, part_file.replace(".pkl", ".pt"))
+        torch.save(out_scenes, out_path)
         print(
             f"     wrote {out_path} ({len(out_scenes)} scenes, "
             f"pose-filled={n_pose}/{n_total}, action-labeled={n_action})"
@@ -223,26 +223,26 @@ def main():
     parser = argparse.ArgumentParser(description="Action-aware SMPL pose consolidation")
     parser.add_argument(
         "--input_dir",
-        default="/misc/dl00/halo/plausibl/joints2smpl/Pose_to_SMPL/fit/output/JRDB_cross_fixed",
+        default="fit/output/JRDB_cross_fixed",
         help=(
             "Directory holding per-part SMPL fit outputs "
-            "(jrdbpose_{split}_part{N}/batch*_params.pkl)"
+            "(jrdbpose_{split}_part{N}/batch*_params.pkl). Run from joints2smpl/Pose_to_SMPL/."
         ),
     )
     parser.add_argument(
         "--jrdb_2dbox_dir",
-        default="/misc/dl00/halo/plausibl/social-transmotion/data/jrdb_2dbox/preprocess",
+        default="../../social-transmotion/data/jrdb_2dbox/preprocess",
         help="Base preprocess providing traj+2dbb tokens and shard structure",
     )
     parser.add_argument(
         "--action_dict",
-        default="/misc/dl00/halo/plausibl/joints2smpl/Pose_to_SMPL/action_dict.json",
+        default="action_dict.json",
         help="JRDB-Act action labels JSON",
     )
     parser.add_argument(
         "--output_dir",
-        default="/misc/dl00/halo/plausibl/social-transmotion/data/jrdb_all_visual_cues/preprocess_smpl_cvpr",
-        help="Target directory for J=26 action-masked preprocess shards",
+        default="../../social-transmotion/data/jrdb_all_visual_cues/preprocess_smpl_cvpr",
+        help="Target directory for J=26 action-masked preprocess shards (.pt)",
     )
     parser.add_argument(
         "--splits",

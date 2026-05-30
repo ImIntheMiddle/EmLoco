@@ -190,9 +190,16 @@ class MultiPersonTrajPoseDataset(torch.utils.data.Dataset):
             saved_dir = f"data/jrdb_all_visual_cues/preprocess_smpl_cvpr/{self.split}"
             load_bar = tqdm.tqdm(os.listdir(saved_dir), dynamic_ncols=True, leave=False)
             for part, file in enumerate(load_bar):
-                with open(os.path.join(saved_dir, file), "rb") as f:
-                    self.datalist += pickle.load(f)
-                    load_bar.set_description(f"Loaded {len(self.datalist)} tracks")
+                file_path = os.path.join(saved_dir, file)
+                # Dispatch by extension: .pkl from the HF release (uploaded under
+                # numpy 2.x), .pt from local consolidate_jrdb_with_action_filter.py.
+                if file.endswith(".pt"):
+                    with open(file_path, "rb") as f:
+                        self.datalist += torch.load(f, weights_only=False)
+                else:
+                    with open(file_path, "rb") as f:
+                        self.datalist += pickle.load(f)
+                load_bar.set_description(f"Loaded {len(self.datalist)} tracks")
                 # if part == 0:
                 # break
         else:

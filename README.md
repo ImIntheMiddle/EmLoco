@@ -122,12 +122,15 @@ The default checkpoint expected by `social-transmotion/evaluate_*.py` is `pacer/
 | `preprocess_smpl_cvpr/jrdb_all_visual_cues/{train,val,test}/part_*.pkl` | 4.5 GB | JRDB J=26 shards with action-aware NaN-fill on pose tokens |
 | `action_dict.json` | 5.5 MB | JRDB-Act labels for per-action ADE/FDE breakdown (optional; eval works without it) |
 
+> If you want to rebuild everything from raw datasets instead of downloading, see **[docs/DATA_PREPARATION.md](docs/DATA_PREPARATION.md)**.
+
 ### Regenerating preprocessed shards from raw data (optional)
 
-If you want to rebuild the preprocessed shards from raw JRDB / JTA / SMPL fits instead of downloading them, see:
+If you want to rebuild the preprocessed shards from raw JRDB / JTA / SMPL fits instead of downloading them, see **[docs/DATA_PREPARATION.md](docs/DATA_PREPARATION.md)** for the full pipeline.
 
-- **JRDB**: `joints2smpl/Pose_to_SMPL/fit/tools/consolidate_jrdb_with_action_filter.py` (consolidates SMPL fits with action-aware NaN-fill).
-- **JTA**: re-pickle the legacy torch-1.x `preprocess_smpl_202510/*.pkl` shards under torch 2.x (the released `.pt` shards in HF are the result of this conversion). A scratch SMPL fit per pedestrian is also feasible via `joints2smpl/Pose_to_SMPL/fit/tools/main.py --dataset_name JRDB`.
+In short:
+- **JTA**: `joints2smpl/Pose_to_SMPL/fit/tools/main.py --dataset_name JTA --save_params` (per-pedestrian SMPL fit) → `joints2smpl/Pose_to_SMPL/fit/tools/save_jta_smplpose.py` (consolidates into J=49 `.pt` shards).
+- **JRDB**: same SMPL fit step → `joints2smpl/Pose_to_SMPL/fit/tools/consolidate_jrdb_with_action_filter.py` (consolidates into J=26 `.pt` shards with action-aware NaN-fill).
 
 ## 🚀Quick Start
 
@@ -162,21 +165,44 @@ Both training scripts default to using the released LocoVal value-net at `pacer/
 
 ### C. (Optional) Re-train the LocoVal value function in Isaac Gym
 
-This step requires the Isaac Gym binaries (see Installation §3). Run from the `pacer/` directory:
+This step requires the Isaac Gym binaries (see Installation §3) **and** the SMPL body models (Installation §4). Outputs the LocoVal value-network checkpoint consumed by `social-transmotion/evaluate_*.py --valueloss_w 1.0` and the inference-time LocoVal filter.
+
+#### Pre-step: generate trajectory caches for PACER
+
+PACER trains its locomotion policy on the **same** JTA / JRDB trajectories used by Social-Transmotion. Caches must be written before policy pretraining:
+
+```bash
+cd social-transmotion
+python load_jta_traj.py  --cfg configs/jta_all_visual_cues.yaml
+python load_jrdb_traj.py --cfg configs/jrdb_all_visual_cues.yaml
+cd ..
+# Outputs:
+#   social-transmotion/data/saved_trajs/jta_all_visual_cues_{train,val,test}_trajs.pkl
+#   social-transmotion/data/saved_trajs/jrdb_all_visual_cues_{train,val,test}_trajs_filterv2.pkl
+```
+
+#### Step 1: pretrain the locomotion-generation policy on JTA + JRDB
 
 ```bash
 cd pacer
-# 1. Pretrain the locomotion-generation policy on JTA + JRDB trajectories
 python pacer/run.py --pipeline=gpu --random_heading --init_heading \
     --adjust_root_vel --num_envs 1600 --real_path JTA+JRDB \
-    --experiment policy_pretrain
+    --experiment policy_pretrain --max_iterations 150000
+# Checkpoints saved every 200 steps under output/exp/pacer/policy_pretrain_<step>.pth
+# CVPR ran this to 150,000 iterations; final ckpt name follows the convention
+# policy_v4_realpath_JTA+JRDB_<global_step>.pth in our experimental tree.
+```
 
-# 2. Train the LocoVal value function on top of the policy
+#### Step 2: train the LocoVal value function on top of the pretrained policy
+
+```bash
 python pacer/run.py --pipeline=gpu --random_heading --num_envs 160 \
-    --load_path output/exp/pacer/policy_pretrain_<step>.pth \
+    --load_path output/exp/pacer/policy_pretrain_00150000.pth \
     --real_path JTA+JRDB --input_init_pose --input_init_vel \
-    --experiment valuenet_train
+    --experiment valuenet_train --max_iterations 25000
 cd ..
+# Final ckpt: pacer/output/exp/pacer/valuenet_realpath_JTA+JRDB_valuenet_00025000.pth
+# This is the file referenced by social-transmotion/configs/*.yaml under `valuenet_checkpoint`.
 ```
 
 ### D. Visualization
