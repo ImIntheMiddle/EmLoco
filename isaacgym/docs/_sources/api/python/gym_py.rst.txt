@@ -1,5 +1,0 @@
-Python Gym API
-##############
-
-.. autoclass:: isaacgym.gymapi.Gym
-    :members:

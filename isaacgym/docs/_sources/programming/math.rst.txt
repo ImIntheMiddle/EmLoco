@@ -1,4 +1,0 @@
-Math Utilities
-###############
-
-See ``examples/maths.py``.
