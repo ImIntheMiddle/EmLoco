@@ -55,10 +55,22 @@ SMPL_mapping = torch.tensor(
 
 
 def concat_frames(batch_data, save_pose_shape=False, dataset="jta", split="train"):
-    """Aggregate per-frame SMPL fit outputs into per-person tensors."""
+    """Aggregate per-frame SMPL fit outputs into per-person tensors.
+
+    `pose_params` / `shape_params` are only needed when --save_pose_shape is
+    requested (downstream SMPL-X transfer). Older fits saved only `Jtr` and
+    `key_list`, so we read them lazily and skip pose/shape aggregation when
+    the keys are missing.
+    """
     Jtr = batch_data["Jtr"]
-    pose_params = batch_data["pose_params"]
-    shape_params = batch_data["shape_params"]
+    has_pose_shape = "pose_params" in batch_data and "shape_params" in batch_data
+    if save_pose_shape and not has_pose_shape:
+        raise KeyError(
+            "--save_pose_shape requires pose_params/shape_params in batch data, "
+            "but the input fits were saved without them."
+        )
+    pose_params = batch_data["pose_params"] if has_pose_shape else None
+    shape_params = batch_data["shape_params"] if has_pose_shape else None
 
     joint_dict, pose_dict, shape_dict = {}, {}, {}
     for i, frame_key in enumerate(batch_data["key_list"]):
@@ -67,8 +79,9 @@ def concat_frames(batch_data, save_pose_shape=False, dataset="jta", split="train
             int(frame_key.split("_frame")[1]),
         )
         joint_dict.setdefault(person_key, {})[frame_num] = Jtr[i]
-        pose_dict.setdefault(person_key, {})[frame_num] = pose_params[i]
-        shape_dict.setdefault(person_key, {})[frame_num] = shape_params[i]
+        if has_pose_shape:
+            pose_dict.setdefault(person_key, {})[frame_num] = pose_params[i]
+            shape_dict.setdefault(person_key, {})[frame_num] = shape_params[i]
 
     frame_concat_dict_joint, frame_concat_dict_pose, frame_concat_dict_shape = (
         {},
