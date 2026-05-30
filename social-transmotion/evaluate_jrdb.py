@@ -114,7 +114,17 @@ def evaluate_ade_fde(
         "data": [],
     }
 
-    action_dict = json.load(open("../joints2smpl/Pose_to_SMPL/action_dict.json"))
+    action_dict_path = "../joints2smpl/Pose_to_SMPL/action_dict.json"
+    if os.path.exists(action_dict_path):
+        action_dict = json.load(open(action_dict_path))
+    else:
+        # action_dict only feeds per-action ADE/FDE breakdown; Total ADE/FDE
+        # are computed independently. Fall back to empty so per-action rows
+        # are reported as "None" instead of crashing.
+        logger.warning(
+            f"{action_dict_path} not found — per-action ADE/FDE will all be 'None'."
+        )
+        action_dict = {"train": {}, "val": {}, "test": {}}
     action_list = [
         "walking",
         "standing",
