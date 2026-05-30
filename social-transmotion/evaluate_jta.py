@@ -954,9 +954,20 @@ if __name__ == "__main__":
         else:
             raise FileNotFoundError("Checkpoint not found")
     else:
-        ckpt_name = (
+        # Default: prefer best_val_checkpoint, fall back to checkpoint.pth.tar
+        # (the HF-released `jta_ours` packs its single weight as `checkpoint.pth.tar`).
+        best_val = (
             f"./experiments/JTA/{args.exp_name}/checkpoints/best_val_checkpoint.pth.tar"
         )
+        last = f"./experiments/JTA/{args.exp_name}/checkpoints/checkpoint.pth.tar"
+        if os.path.exists(best_val):
+            ckpt_name = best_val
+        elif os.path.exists(last):
+            ckpt_name = last
+        else:
+            raise FileNotFoundError(
+                f"Neither {best_val} nor {last} found for --exp_name {args.exp_name}"
+            )
 
     logdir = os.path.join("./experiments/JTA", args.exp_name, "eval_logs")
     os.makedirs(logdir, exist_ok=True)
