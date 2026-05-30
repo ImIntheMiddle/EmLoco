@@ -1,0 +1,72 @@
+# --- Python ---
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+build/
+dist/
+*.so
+
+# --- uv / virtualenvs ---
+.venv/
+.venv-*/
+
+# --- IDEs / editors ---
+.idea/
+.vscode/
+*.swp
+*~
+
+# --- OS junk ---
+.DS_Store
+__MACOSX/
+.ipynb_checkpoints/
+
+# --- Logs / experiment artifacts ---
+*.log
+*.out
+logs/
+wandb/
+outputs/
+experiments/
+
+# --- Datasets / processed data ---
+# (root-level dataset stash; pacer/pacer/data is tracked SMPL assets — don't ignore)
+/data/
+social-transmotion/data/
+pacer/data/
+pacer/log/
+pacer/output/
+pacer/wandb/
+EqMotion/eth_ucy/data/
+EqMotion/eth_ucy/**/*.npy
+
+# --- Model weights / archives ---
+*.pth
+*.pth.tar
+*.pt
+*.pkl
+*.npz
+*.zip
+*.tar
+*.tar.gz
+# Whitelist the sample pose npz that ships with Pose_to_SMPL demo
+!joints2smpl/Pose_to_SMPL/143_01_poses.npz
+
+# --- Rendered media (regenerable) ---
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.mp4
+!overview.png
+
+# --- IsaacGym build artifacts ---
+isaacgym/python/build/
+isaacgym/python/isaacgym/_bindings/
+isaacgym/python/isaacgym.egg-info/
+
+# Symlinks to plausibl (internal dev working tree)
+joints2smpl/Pose_to_SMPL/action_dict.json
+social-transmotion/experiments

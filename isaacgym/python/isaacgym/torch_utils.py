@@ -132,7 +132,7 @@ def get_basis_vector(q, v):
     return quat_rotate(q, v)
 
 
-def get_axis_params(value, axis_idx, x_value=0., dtype=np.float, n_dims=3):
+def get_axis_params(value, axis_idx, x_value=0., dtype=float, n_dims=3):
     """construct arguments to `Vec` according to axis index.
     """
     zs = np.zeros((n_dims,))

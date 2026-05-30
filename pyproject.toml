@@ -1,0 +1,95 @@
+[project]
+name = "emloco"
+version = "0.1.0"
+description = "EmLoco: Physical Plausibility-aware Trajectory Prediction via Locomotion Embodiment (CVPR 2025)"
+readme = "README.md"
+requires-python = "==3.8.*"
+authors = [
+    { name = "Hiromu Taketsugu" },
+]
+dependencies = [
+    # --- Core scientific stack ---
+    "torch==2.2.0",
+    "torchvision==0.17.0",
+    "numpy==1.24.4",
+    "scipy==1.10.1",
+    "matplotlib==3.6.3",
+    "pillow",
+    "scikit-image==0.21.0",
+    "scikit-learn",
+    "opencv-python>=4.8.1.78",
+    "trimesh==4.10.0",
+    "vtk==9.5.2",
+    "tqdm",
+    "pyyaml",
+    "easydict",
+    "ipdb",
+    "rich==14.2.0",
+    "termcolor",
+    "setuptools==69.5.1",
+
+    # --- Training / logging infrastructure ---
+    "lightning==2.3.3",      # provides both `lightning` and `pytorch_lightning`
+    "tensorboard==2.14.0",
+    "tensorboardx",
+    "wandb==0.23.1",
+    "progress==1.6.1",
+    "optuna",                # used by hyper-tuning and train_{jrdb,amass}.py
+
+    # --- PACER (RL & physics) ---
+    "gym>=0.23,<0.26",       # PACER uses the legacy gym API; do not switch to gymnasium
+    # The 1.1.4 sdist on PyPI ships a top_level.txt with a leading blank line, which uv
+    # mis-detects as "missing" and reinstalls every `uv sync`. The warning is harmless —
+    # imports succeed and downstream behaviour is unchanged. Upstream has no v1.1.x git tag.
+    "rl-games==1.1.4",
+    "mujoco",
+    "torchgeometry",
+    "joblib>=1.2.0",
+    "lxml",
+    "autograd",
+    "pyvirtualdisplay",
+    "imageio-ffmpeg",
+    "gdown",
+    "numpy-stl",
+    "human-body-prior",
+
+    # --- Social-Transmotion ---
+    "pykalman",
+    "six",
+
+    # --- EqMotion ---
+    "seaborn",
+
+    # --- SMPL fitting (PACER + joints2smpl/Pose_to_SMPL) ---
+    "smplx",
+    # chumpy-fix is a numpy-1.20+ compatible drop-in for the unmaintained chumpy package.
+    "chumpy-fix==0.0.1",
+
+    # --- Bundled editable packages ---
+    "isaacgym",
+    "poselib",
+]
+
+[tool.uv.sources]
+# IsaacGym is bundled in this repo (./isaacgym/), no need to fetch from NVIDIA.
+isaacgym = { path = "./isaacgym/python", editable = true }
+# pacer/poselib and social-transmotion/poselib are identical; pick the PACER copy as the editable install.
+poselib = { path = "./pacer/poselib", editable = true }
+# Customized SMPL-X used by PACER (pinned to the revision verified with EmLoco-Rec).
+smplx = { git = "https://github.com/ZhengyiLuo/smplx.git", rev = "a5b8e4ac14f79f3f33fd2cf2a16e6f507146b813" }
+
+[[tool.uv.index]]
+name = "pytorch-cu121"
+url = "https://download.pytorch.org/whl/cu121"
+explicit = true
+
+[tool.uv.sources.torch]
+index = "pytorch-cu121"
+
+[tool.uv.sources.torchvision]
+index = "pytorch-cu121"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3.5",
+]
