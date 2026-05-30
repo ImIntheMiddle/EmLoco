@@ -63,10 +63,16 @@ If you only use the released LocoVal checkpoint, **skip this step** — nothing 
 
 ### 4. SMPL body model
 
-`pacer/` / `joints2smpl/` need SMPL parameters. Register at the [official SMPL site](https://smpl.is.tue.mpg.de/) (v1.1.0), then place renamed files at `pacer/data/smpl/`:
+`pacer/` and `joints2smpl/` need SMPL parameters. Register at the [official SMPL site](https://smpl.is.tue.mpg.de/) (v1.1.0), then place the renamed files at **both** locations (the two subprojects load SMPL from different relative paths):
 
-```
+```bash
+# Primary copy (PACER expects this path)
 pacer/data/smpl/{SMPL_NEUTRAL.pkl, SMPL_MALE.pkl, SMPL_FEMALE.pkl}
+
+# Symlink for joints2smpl's smplpytorch loader
+ln -s "$PWD/pacer/data/smpl/SMPL_NEUTRAL.pkl" joints2smpl/Pose_to_SMPL/smplpytorch/native/models/SMPL_NEUTRAL.pkl
+ln -s "$PWD/pacer/data/smpl/SMPL_MALE.pkl"    joints2smpl/Pose_to_SMPL/smplpytorch/native/models/SMPL_MALE.pkl
+ln -s "$PWD/pacer/data/smpl/SMPL_FEMALE.pkl"  joints2smpl/Pose_to_SMPL/smplpytorch/native/models/SMPL_FEMALE.pkl
 ```
 
 (See `pacer/README.md` for the standard rename mapping.)
@@ -171,7 +177,22 @@ Both training scripts default to using the released LocoVal value-net at `pacer/
 
 This step requires the Isaac Gym binaries (see Installation §3) **and** the SMPL body models (Installation §4). Outputs the LocoVal value-network checkpoint consumed by `social-transmotion/evaluate_*.py --valueloss_w 1.0` and the inference-time LocoVal filter.
 
-#### Pre-step: generate trajectory caches for PACER
+> [!Important]
+> **Activate the uv venv before running `pacer/run.py`** (`source .venv-22.04/bin/activate`). PACER JIT-compiles `gymtorch` via `ninja`, which is only on `PATH` once the venv is active.
+
+#### Pre-step 1: fetch PACER sample data (AMASS shapes, neutral pose, occlusions)
+
+```bash
+cd pacer
+bash download_data.sh
+cd ..
+# Populates:
+#   pacer/sample_data/amass_isaac_gender_betas_unique.pkl  (AMASS body shape pool)
+#   pacer/sample_data/standing_neutral.pkl
+#   pacer/sample_data/amass_copycat_occlusion_v2.pkl
+```
+
+#### Pre-step 2: generate trajectory caches for PACER
 
 PACER trains its locomotion policy on the **same** JTA / JRDB trajectories used by Social-Transmotion. Caches must be written before policy pretraining:
 

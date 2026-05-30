@@ -5,14 +5,12 @@
 # distribution of this software and related documentation without an express
 # license agreement from NVIDIA CORPORATION is strictly prohibited.
 
-import glob
 import os
 import sys
-import pdb
 import os.path as osp
 
 sys.path.append(os.getcwd())
-os.environ["MESA_VK_DEVICE_SELECT"] = "10de:2230" # dl41
+os.environ["MESA_VK_DEVICE_SELECT"] = "10de:2230"  # dl41
 # os.environ["MESA_VK_DEVICE_SELECT"] = "10de:1b80" # dl32
 
 from utils.config import (
@@ -24,17 +22,13 @@ from utils.config import (
 )
 from utils.parse_task import parse_task
 
-from rl_games.algos_torch import players
 from rl_games.algos_torch import torch_ext
-from rl_games.common import env_configurations, experiment, vecenv
+from rl_games.common import env_configurations, vecenv
 from rl_games.common.algo_observer import AlgoObserver
 from rl_games.torch_runner import Runner
 
 from pacer.utils.flags import flags
 
-import numpy as np
-import copy
-import torch
 import wandb
 
 from learning import amp_continuous
@@ -292,9 +286,9 @@ def main():
         False,
         False,
         False,
-        False, # use real path default: False
-        False, # use jta default: False
-        False, # use jrdb default: False
+        False,  # use real path default: False
+        False,  # use jta default: False
+        False,  # use jrdb default: False
         args.pred_path,
         args.small_terrain,
         cfg_train["params"]["config"]["player"].get("render", False),
@@ -344,13 +338,14 @@ def main():
     if (not args.no_log) and (not args.test) and (not args.debug):
         wandb.init(
             project=project_name,
-            resume=not args.resume_str is None,
+            resume=args.resume_str is not None,
             id=args.resume_str,
             notes=cfg.get("'notes", "no notes"),
         )
         wandb.config.update(cfg, allow_val_change=True)
         wandb.run.name = cfg_env_name + "_" + args.experiment
-        wandb.run.save()
+        # Modern wandb (>=0.16) auto-commits `wandb.run.name = ...`; the legacy
+        # no-arg `wandb.run.save()` now requires a glob_str and raises TypeError.
 
     cfg_train["params"]["seed"] = set_seed(
         cfg_train["params"].get("seed", -1),
