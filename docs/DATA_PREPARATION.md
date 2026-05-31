@@ -13,7 +13,7 @@
 JTA raw videos + annotations
   │  (Social-Transmotion preprocessing — see upstream repo; not bundled here)
   ▼
-social-transmotion/data/jta_all_visual_cues/preprocess/{train,val,test}/part_<N>.pkl
+social-transmotion/data/jta_all_visual_cues/preprocess/{train,val,test}/part_<N>.pt
   │
   ├─▶ load_jta_3dpose.py    ──▶ data/jta_all_visual_cues/original_pose/<split>/*.pkl   (required for SMPL fit)
   │     │
@@ -31,7 +31,7 @@ social-transmotion/data/jta_all_visual_cues/preprocess/{train,val,test}/part_<N>
 JRDB raw + JRDB-Act labels
   │  (Social-Transmotion preprocessing — see upstream repo; not bundled here)
   ▼
-social-transmotion/data/jrdb_2dbox/preprocess/{train,val,test}/part_<N>.pkl
+social-transmotion/data/jrdb_2dbox/preprocess/{train,val,test}/part_<N>.pt
   │
   ├─▶ load_jrdb_3dpose.py   ──▶ data/jrdb_all_visual_cues/original_pose/<split>/*.pkl   (required for SMPL fit)
   │     │
@@ -61,16 +61,16 @@ All commands below assume the repository root as CWD unless `cd` is shown.
 
 ## 2. JTA Pipeline
 
-### 2.1 Build the Social-Transmotion `.pkl` shards (J=49)
+### 2.1 Build the Social-Transmotion `.pt` shards (J=49)
 
-Upstream Social-Transmotion ships per-sequence `.ndjson` files in a [GitHub Release](https://github.com/vita-epfl/social-transmotion/releases/tag/ckpt_data); EmLoco's `dataset_jta.py` then chunks them into `preprocess/*.pkl` shards on first instantiation with `preprocessed=False`.
+Upstream Social-Transmotion ships per-sequence `.ndjson` files in a [GitHub Release](https://github.com/vita-epfl/social-transmotion/releases/tag/ckpt_data); EmLoco's `dataset_jta.py` then chunks them into `preprocess/*.pt` shards on first instantiation with `preprocessed=False`.
 
 ```bash
 # 1. Stage upstream's per-sequence ndjsons under social-transmotion/data/jta_all_visual_cues/
 #    (unzip releases.zip from the upstream tag above; place its `jta/data/{train,val,test}/`
 #     subdir at social-transmotion/data/jta_all_visual_cues/{train,val,test}/)
 
-# 2. Trigger one-time chunking (writes 5000-track .pkl shards):
+# 2. Trigger one-time chunking (writes 5000-track .pt shards):
 cd social-transmotion
 python -c "
 from dataset_jta import JtaAllVisualCuesDataset
@@ -79,7 +79,7 @@ for split in ['train', 'val', 'test']:
         segmented=True, add_flips=False, preprocessed=False)
 "
 cd ..
-# Output: social-transmotion/data/jta_all_visual_cues/preprocess/{train,val,test}/part_<N>.pkl
+# Output: social-transmotion/data/jta_all_visual_cues/preprocess/{train,val,test}/part_<N>.pt
 ```
 
 ### 2.2 Extract per-pedestrian 3D pose (`original_pose/`)
@@ -140,9 +140,9 @@ cd ..
 
 ## 3. JRDB Pipeline
 
-### 3.1 Build the Social-Transmotion `.pkl` shards
+### 3.1 Build the Social-Transmotion `.pt` shards
 
-Same one-step recipe as JTA — stage upstream's per-scene `.ndjson` files (from the same [Social-Transmotion releases.zip](https://github.com/vita-epfl/social-transmotion/releases/tag/ckpt_data); its `jrdb/data/{train,val,test}/` subdir) under `social-transmotion/data/jrdb_2dbox/`, then trigger `Jrdb2dboxDataset(preprocessed=False)` once to chunk them into `preprocess/{split}/part_<N>.pkl` shards.
+Same one-step recipe as JTA — stage upstream's per-scene `.ndjson` files (from the same [Social-Transmotion releases.zip](https://github.com/vita-epfl/social-transmotion/releases/tag/ckpt_data); its `jrdb/data/{train,val,test}/` subdir) under `social-transmotion/data/jrdb_2dbox/`, then trigger `Jrdb2dboxDataset(preprocessed=False)` once to chunk them into `preprocess/{split}/part_<N>.pt` shards.
 
 ```bash
 cd social-transmotion
@@ -153,7 +153,7 @@ for split in ['train', 'val', 'test']:
         track_cutoff=9, segmented=True, add_flips=False, preprocessed=False)
 "
 cd ..
-# Output: social-transmotion/data/jrdb_2dbox/preprocess/{train,val,test}/part_<N>.pkl
+# Output: social-transmotion/data/jrdb_2dbox/preprocess/{train,val,test}/part_<N>.pt
 ```
 
 ### 3.2 Extract per-pedestrian 3D pose (`original_pose/`)

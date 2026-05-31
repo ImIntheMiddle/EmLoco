@@ -4,7 +4,6 @@ import sys
 import torch
 from torch.nn.utils.rnn import pad_sequence
 
-import pickle
 import tqdm
 
 # Compatibility shim: preprocessed shards may have been saved under numpy 2.x where the
@@ -181,20 +180,19 @@ class MultiPersonTrajPoseDataset(torch.utils.data.Dataset):
                 all_tracks.append(people)
                 part_tracks.append(people)
                 if len(part_tracks) >= 5000:
-                    with open(
-                        f"data/{self.name}/preprocess/{self.split}/part_{part}.pkl",
-                        "wb",
-                    ) as f:
-                        pickle.dump(part_tracks, f)
+                    torch.save(
+                        part_tracks,
+                        f"data/{self.name}/preprocess/{self.split}/part_{part}.pt",
+                    )
                     print(f"Processed {len(all_tracks)} tracks")
                     part_tracks = []
                     part += 1
 
         self.datalist = all_tracks
-        with open(
-            f"data/{self.name}/preprocess/{self.split}/part_{part}.pkl", "wb"
-        ) as f:
-            pickle.dump(part_tracks, f)
+        torch.save(
+            part_tracks,
+            f"data/{self.name}/preprocess/{self.split}/part_{part}.pt",
+        )
         print(f"Processed {len(all_tracks)} tracks")
 
     def __len__(self):

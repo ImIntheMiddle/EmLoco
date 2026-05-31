@@ -8,6 +8,8 @@ at any source mesh.
 Note: not part of the default pipeline, so its `pyrender` / `trimesh`
 dependencies are not in pyproject.toml. Install them manually before use:
     pip install pyrender trimesh
+Run headless with the EGL backend:
+    PYOPENGL_PLATFORM=egl python scripts/render_mesh.py --mesh ...
 """
 
 import argparse

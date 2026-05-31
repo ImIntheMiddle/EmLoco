@@ -5,6 +5,7 @@ import json
 import pickle
 import argparse
 import numpy as np
+import torch
 import tqdm
 import matplotlib.pyplot as plt
 
@@ -18,15 +19,26 @@ def read_json(file_path):
 def load_jrdb_data(opt):
     datalist = []
     dataset_name = "jrdb_2dbox"
-    # Filter to .pkl shards: stray .pt files in the same directory would crash
-    # pickle.load. The upstream JRDB preprocess only writes .pkl.
     preprocess_dir = f"data/{dataset_name}/preprocess/{opt.split}"
-    files = sorted(f for f in os.listdir(preprocess_dir) if f.endswith(".pkl"))
+    # Dispatch by extension: dataset_jrdb.initialize() now writes .pt, but legacy
+    # plausibl-era runs left .pkl shards behind. Prefer .pt when both exist for
+    # the same part.
+    files_pt = {f for f in os.listdir(preprocess_dir) if f.endswith(".pt")}
+    files_pkl = {
+        f
+        for f in os.listdir(preprocess_dir)
+        if f.endswith(".pkl") and f[:-4] + ".pt" not in files_pt
+    }
+    files = sorted(files_pt | files_pkl)
     load_bar = tqdm.tqdm(files)
     for part, file in enumerate(load_bar):
-        with open(f"{preprocess_dir}/{file}", "rb") as f:
-            datalist.append(pickle.load(f))
-            load_bar.set_description(f"Loaded {len(datalist)} parts")
+        path = f"{preprocess_dir}/{file}"
+        if file.endswith(".pt"):
+            datalist.append(torch.load(path, weights_only=False))
+        else:
+            with open(path, "rb") as f:
+                datalist.append(pickle.load(f))
+        load_bar.set_description(f"Loaded {len(datalist)} parts")
     return datalist
 
 

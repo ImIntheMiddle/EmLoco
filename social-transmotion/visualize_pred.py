@@ -165,8 +165,7 @@ if __name__ == "__main__":
         )
 
     picked_sample = []  # initialize picked sample
-    for frame_num in [2]:
-        # for frame_num in [args.frame_num]:
+    for frame_num in [args.frame_num]:
         print(f"Frame number: {frame_num}")
         data = []
         # load visualization data
@@ -178,9 +177,11 @@ if __name__ == "__main__":
                 # split = paths[name][1]
                 # modality_selection = paths[name][2]
                 modality_selection = paths[name][1]
-                # path = os.path.join(f'./experiments/{exp_name}/visualization/3d_plot/{split}/{modality_selection}', 'vis_dict.pkl')
+                # Dataset prefix (JTA / JRDB) auto-detected from exp_name; either
+                # explicit `experiments/<JTA|JRDB>/<exp>/...` layout works.
+                dataset_prefix = "JTA" if "jta" in exp_name.lower() else "JRDB"
                 path = os.path.join(
-                    f"./experiments/{exp_name}/visualization/3d_plot/test/{modality_selection}",
+                    f"./experiments/{dataset_prefix}/{exp_name}/visualization/3d_plot/test/{modality_selection}",
                     f"vis_dict_{frame_num}frame.pkl",
                 )
                 if not os.path.exists(path):

@@ -142,9 +142,13 @@ def save_pose_and_shape(
 def load_preprocessed_part_data(part_name, preprocess_root):
     split = part_name.split("_")[1]
     part = part_name.split("part")[1]
-    with open(f"{preprocess_root}/{split}/part_{part}.pkl", "rb") as f:
-        jta_data = pickle.load(f)
-    return jta_data
+    # Prefer .pt (dataset_jta.initialize() output); fall back to legacy .pkl.
+    pt_path = f"{preprocess_root}/{split}/part_{part}.pt"
+    pkl_path = f"{preprocess_root}/{split}/part_{part}.pkl"
+    if os.path.exists(pt_path):
+        return torch.load(pt_path, weights_only=False)
+    with open(pkl_path, "rb") as f:
+        return pickle.load(f)
 
 
 def replace_batch_smpl_pose(jta_data, smpl_data, frame_concat_dict, jta_data_counter):

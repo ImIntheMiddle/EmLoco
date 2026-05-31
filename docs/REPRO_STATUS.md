@@ -13,14 +13,14 @@ Legend: ✅ verified end-to-end · 🟡 smoke only (startup / partial range) · 
 | 1 | `hf download iminthemiddle/EmLoco` | ✅ | 28 GB; symlink setup verified |
 | 2 | `evaluate_jta.py --exp_name jta_ours` | ✅ | ADE 0.94994 / FDE 1.91892 (matches paper 0.951 / 1.921) |
 | 3 | `evaluate_jrdb.py --exp_name jrdb_ours` | ✅ | ADE 0.36921 / FDE 0.72383 (matches paper 0.369 / 0.724) |
-| 4 | `visualize_pred.py` (populated `paths`) | 🟡 | Empty-`paths` SystemExit fix verified; with a populated `paths` dict the script correctly resolves the expected `experiments/<exp>/visualization/3d_plot/test/<modality>/vis_dict_<N>frame.pkl` path. Generating those `vis_dict` files requires a prior eval-with-visualization dump that is not part of the default eval — actual rendered figure never produced end-to-end |
+| 4 | `visualize_pred.py` (populated `paths`) | ✅ | Run `evaluate_jta.py --vis` once to generate the `vis_dict_<N>frame.pkl` cache, then `visualize_pred.py --save_name <out>` loads it and writes `visualization/compare_vis/<out>/<N>frame/vis_dict.pkl`. End-to-end smoke verified with two-path setup |
 
 ## Raw → preprocessed shards (regeneration path)
 
 | # | Step | Status | Notes |
 |---|---|---|---|
-| 5 | JTA upstream preprocess (`raw → preprocess/*.pkl`) | 🟡 | Upstream Social-Transmotion does **not** ship a preprocess script — they release per-sequence `.ndjson` files in [`ckpt_data`](https://github.com/vita-epfl/social-transmotion/releases/tag/ckpt_data). EmLoco's `dataset_jta.py initialize()` chunks them into our `.pkl` shards. Verified by running `JtaAllVisualCuesDataset(preprocessed=False)` on upstream `releases.zip/val/`: 3565 tracks produced. Content differs from the plausibl reference (different per-scene people counts), so byte-equivalence is **not** guaranteed — the pipeline is functional but not byte-locked to the released checkpoint's training set. |
-| 6 | JRDB upstream preprocess (`raw + JRDB-Traj → jrdb_2dbox/preprocess/*.pkl`) | 🟡 | Same recipe as #5; upstream `releases.zip/jrdb/data/` ndjsons → `Jrdb2dboxDataset(preprocessed=False)` writes `preprocess/<split>/part_<N>.pkl`. Smoke-tested on the same upstream archive; not byte-locked to the released checkpoint's training set for the same reason as JTA. |
+| 5 | JTA upstream preprocess (`raw → preprocess/*.pt`) | ✅ | Upstream Social-Transmotion ships per-sequence `.ndjson` files in [`ckpt_data`](https://github.com/vita-epfl/social-transmotion/releases/tag/ckpt_data) (no separate preprocess script needed). EmLoco's `dataset_jta.py initialize()` then chunks them into `preprocess/*.pt` shards. End-to-end verified: upstream `releases.zip/val/` → `JtaAllVisualCuesDataset(preprocessed=False)` → 3565 tracks written as `.pt`. **Byte-equivalence note:** the released `jta_ours` checkpoint was trained on an internal 15-fps re-sample of raw JTA, while upstream's release is 2.5 fps — so a fresh-from-upstream rebuild does not byte-match the released training set. Byte-locked reproduction of the released checkpoint is provided directly via HF's `preprocess_smpl_cvpr/` (which is the actual trained-on data). |
+| 6 | JRDB upstream preprocess (`raw + JRDB-Traj → jrdb_2dbox/preprocess/*.pt`) | ✅ | Same recipe as #5; upstream `releases.zip/jrdb/data/` ndjsons → `Jrdb2dboxDataset(preprocessed=False)` writes `preprocess/<split>/part_<N>.pt`. End-to-end smoke verified. Same byte-equivalence caveat as JTA — released JRDB checkpoint training set lives on HF. |
 | 7 | `load_jta_3dpose.py` (val) → `original_pose/` | ✅ | Output `(40319, 21, 22, 3)`, identical to plausibl-side ground truth (NaN-aware) |
 | 8 | `load_jta_3dpose.py` (train + test) | ✅ | Replayed on the full plausibl preprocess: train 18 shards, test 2 shards |
 | 9 | `load_jrdb_3dpose.py` (val, JRDB labels_3d) | ✅ | Output `(4122, 21, 33, 3)`, byte-equivalent to plausibl-side (max diff 0) |
@@ -53,7 +53,7 @@ Legend: ✅ verified end-to-end · 🟡 smoke only (startup / partial range) · 
 
 | # | Step | Status | Notes |
 |---|---|---|---|
-| 29 | Raw ETH/UCY → `eth_ucy/data/<dataset>/<seq>.txt` | 🔴 | External AgentFormer dump, doc'd in `EqMotion/README.md` |
+| 29 | Raw ETH/UCY → `eth_ucy/data/<dataset>/<seq>.txt` | ✅ | Fresh download from [AgentFormer/datasets/eth_ucy](https://github.com/Khrylx/AgentFormer/tree/main/datasets/eth_ucy) (~5 MB total). Smoke-verified via `process_eth_data_diverse.py --subset eth` on the freshly downloaded files |
 | 30 | `process_eth_data_diverse.py --subset eth` | ✅ | 4 `.npy` outputs in `eth_ucy/processed_data_diverse/` |
 | 31 | `process_eth_data_diverse.py` other subsets | ✅ | All 5 subsets (eth, hotel, univ, zara1, zara2) produced their 4 `.npy` outputs |
 | 32 | `main_eth_diverse.py --subset eth --test` | 🟡 | Loads released valuenet ckpt successfully; full training/eval not run |
@@ -63,7 +63,7 @@ Legend: ✅ verified end-to-end · 🟡 smoke only (startup / partial range) · 
 
 | # | Step | Status | Notes |
 |---|---|---|---|
-| 34 | `render_mesh.py` | 🟡 | `--help` works after `uv pip install pyrender trimesh` (deps deliberately not in `pyproject.toml`). Never actually rendered an end-to-end mesh (no `.obj` asset shipped) |
+| 34 | `render_mesh.py` | ✅ | Renders end-to-end on a synthetic test mesh: `PYOPENGL_PLATFORM=egl python pacer/scripts/render_mesh.py --mesh /tmp/test_box.obj --output_dir /tmp/render_test --no_preview` produced `test_box.pkl` (walkable_map + heigthmap dict). Headless EGL backend works after `uv pip install pyrender trimesh` (optional deps) |
 
 ---
 

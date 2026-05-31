@@ -177,11 +177,18 @@ def consolidate_split(split, args, action_dict):
 
     scene_action_dict = action_dict.get(split, {})
 
-    parts = sorted(p for p in os.listdir(jrdb_2dbox_split_dir) if p.endswith(".pkl"))
+    # Prefer .pt (dataset_jrdb.initialize() output); fall back to legacy .pkl.
+    files_pt = {p for p in os.listdir(jrdb_2dbox_split_dir) if p.endswith(".pt")}
+    files_pkl = {
+        p
+        for p in os.listdir(jrdb_2dbox_split_dir)
+        if p.endswith(".pkl") and p[:-4] + ".pt" not in files_pt
+    }
+    parts = sorted(files_pt | files_pkl)
     grand_total = grand_pose = grand_action = 0
 
     for part_file in parts:
-        # part_file: "part_0.pkl" -> part_id = 0
+        # part_file: "part_0.{pkl,pt}" -> part_id = 0
         part_id = int(re.search(r"part_(\d+)", part_file).group(1))
         fit_dir = os.path.join(args.input_dir, f"jrdbpose_{split}_part{part_id}")
         if not os.path.isdir(fit_dir):
@@ -192,8 +199,12 @@ def consolidate_split(split, args, action_dict):
         smpl_jtr = load_smpl_jtr_for_part(fit_dir)
         print(f"     SMPL Jtr keys: {len(smpl_jtr)}")
 
-        with open(os.path.join(jrdb_2dbox_split_dir, part_file), "rb") as f:
-            scene_list = pickle.load(f)
+        part_path = os.path.join(jrdb_2dbox_split_dir, part_file)
+        if part_file.endswith(".pt"):
+            scene_list = torch.load(part_path, weights_only=False)
+        else:
+            with open(part_path, "rb") as f:
+                scene_list = pickle.load(f)
         print(f"     jrdb_2dbox scenes: {len(scene_list)}")
 
         out_scenes, n_total, n_pose, n_action = build_preprocess_smpl_shard(
