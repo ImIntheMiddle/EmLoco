@@ -356,7 +356,10 @@ def main():
                 lr_now = lr_decay(optimizer, lr_now, args.lr_gamma)
         train(model, optimizer, epoch, loader_train, valuenet)
         if epoch % args.test_interval == 0:
-            test_loss, ade, _, _, _, _ = test(
+            # test() returns (minfde, minade, meanade, meanfde, filtered_ade,
+            # filtered_fde, out_ade, out_fde) — historically the caller bound
+            # `test_loss` = minfde and `ade` = minade.
+            test_loss, ade, _, _, _, _, _, _ = test(
                 model, optimizer, epoch, loader_test, backprop=False
             )
             results["epochs"].append(epoch)
@@ -371,6 +374,7 @@ def main():
                     "state_dict": model.state_dict(),
                     "optimizer": optimizer.state_dict(),
                 }
+                os.makedirs(args.model_save_dir, exist_ok=True)
                 file_path = os.path.join(
                     args.model_save_dir, str(args.subset) + "_ckpt_best.pth.tar"
                 )
