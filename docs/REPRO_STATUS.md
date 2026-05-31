@@ -57,7 +57,7 @@ Legend: ✅ verified end-to-end · 🟡 smoke only (startup / partial range) · 
 | 30 | `process_eth_data_diverse.py --subset eth` | ✅ | 4 `.npy` outputs in `eth_ucy/processed_data_diverse/` |
 | 31 | `process_eth_data_diverse.py` other subsets | ✅ | All 5 subsets (eth, hotel, univ, zara1, zara2) produced their 4 `.npy` outputs |
 | 32 | `main_eth_diverse.py --subset eth --test` | 🟡 | Loads released valuenet ckpt successfully; full training/eval not run |
-| 33 | EqMotion full train (60 epochs × 5 subsets) | 🔴 | Hours per subset |
+| 33 | EqMotion full train (60 epochs × 5 subsets) | 🟡 | Training pipeline is functional but **CPU-bound at `batch_size=1`** (DataLoader workers dominate, GPU stays at ~15 %): measured ~1 hour per epoch, putting a single 60-epoch subset at ~60 hours and the full 5-subset sweep at ~300 hours — not feasible to run in this session. Partial 3-epoch eth run shows training loss decreases monotonically (0.364 → 0.316 → 0.310) and test ADE oscillates around 0.6 (paper target ≈0.40), i.e. converging but not yet at paper level. Recommend a follow-up offline run after refactoring the dataloader / increasing `batch_size`. |
 
 ## Optional / experimental scripts
 
