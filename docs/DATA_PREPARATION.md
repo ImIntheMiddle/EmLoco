@@ -33,7 +33,7 @@ JRDB raw + JRDB-Act labels
   ▼
 social-transmotion/data/jrdb_2dbox/preprocess/{train,val,test}/part_<N>.pkl
   │
-  ├─▶ load_jrdb_3dpose.py   ──▶ data/jrdb_3dpose/original_pose/<split>/*.pkl   (required for SMPL fit)
+  ├─▶ load_jrdb_3dpose.py   ──▶ data/jrdb_all_visual_cues/original_pose/<split>/*.pkl   (required for SMPL fit)
   │     │
   │     ▼  joints2smpl/Pose_to_SMPL/fit/tools/main.py --dataset_name JRDB --save_params
   │   fit/output/JRDB_cross_fixed/jrdbpose_<split>_part<N>/batch*_params.pkl
@@ -52,6 +52,7 @@ social-transmotion/data/jrdb_2dbox/preprocess/{train,val,test}/part_<N>.pkl
 |---|---|---|
 | Raw JTA videos + annotations | [JTA-Dataset](https://github.com/fabbrimatteo/JTA-Dataset) | Registration required |
 | Raw JRDB sequences | [jrdb.erc.monash.edu](https://jrdb.erc.monash.edu/) | Registration required |
+| JRDB 3D pose JSONs (HST format) | [JRDB-Pose](https://jrdb.erc.monash.edu/dataset/pose) → preprocessed via [human-scene-transformer](https://github.com/google-research/human-scene-transformer/tree/main/human_scene_transformer/data) | `load_jrdb_3dpose.py` expects per-scene JSONs with a `labels` key (HST output format), not the raw JRDB-Pose detections |
 | JRDB-Act action labels | [JRDB Activity](https://jrdb.erc.monash.edu/dataset/activity) | `labels_2d_stitched/` is the input we consume |
 | SMPL body models v1.1.0 | [smpl.is.tue.mpg.de](https://smpl.is.tue.mpg.de/) | Place per the main [README §SMPL body models](../README.md#smpl-body-models) |
 | Working `uv sync` env | This repo | See main [README §Installation](../README.md#installation) |
@@ -82,6 +83,9 @@ python load_jta_3dpose.py --split test
 cd ..
 # Output: social-transmotion/data/jta_all_visual_cues/original_pose/<split>/jtapose_<split>_part<N>.pkl
 ```
+
+> [!Note]
+> Internal CVPR experiments sometimes split the training set into `train`, `train2`, `train3`, `train4` for parallel SMPL fitting; a single unified `train` is sufficient for reproducing the released checkpoints.
 
 ### 2.3 Per-pedestrian SMPL fitting
 
@@ -128,7 +132,7 @@ cd ..
 ### 3.1 Build the Social-Transmotion `.pkl` shards
 
 > [!Note]
-> The JRDB preprocessing script is **not** bundled here. Follow the recipes in the [upstream Social-Transmotion repo](https://github.com/vita-epfl/social-transmotion) and the [JRDB-Traj](https://github.com/vita-epfl/JRDB-Traj) reference to produce the J=26 base shards (with raw JRDB scenes from [jrdb.erc.monash.edu](https://jrdb.erc.monash.edu/)).
+> Neither the JRDB nor the JRDB-Act preprocessing scripts are bundled in this repo (and as of writing there is no single JRDB script in the [upstream Social-Transmotion repo](https://github.com/vita-epfl/social-transmotion) either). Follow Social-Transmotion's overall recipe together with the [JRDB-Traj](https://github.com/vita-epfl/JRDB-Traj) reference (raw scenes from [jrdb.erc.monash.edu](https://jrdb.erc.monash.edu/)) to assemble the J=26 base shards.
 >
 > Expected output layout:
 > ```
@@ -139,13 +143,16 @@ cd ..
 
 Required input for the SMPL fit step (3.4).
 
+> [!Important]
+> `load_jrdb_3dpose.py` reads **HST-formatted** per-scene JSONs (each file has a `"labels"` key) — not the raw JRDB-Pose detections. Run [human-scene-transformer](https://github.com/google-research/human-scene-transformer/tree/main/human_scene_transformer/data)'s preprocessing on JRDB-Pose first to produce that format, then point `--hst_dir` at the resulting directory.
+
 ```bash
 cd social-transmotion
-python load_jrdb_3dpose.py --split train
-python load_jrdb_3dpose.py --split val
-python load_jrdb_3dpose.py --split test
+python load_jrdb_3dpose.py --split train --hst_dir <path-to-HST-JSONs>
+python load_jrdb_3dpose.py --split val   --hst_dir <path-to-HST-JSONs>
+python load_jrdb_3dpose.py --split test  --hst_dir <path-to-HST-JSONs>
 cd ..
-# Output: social-transmotion/data/jrdb_3dpose/original_pose/<split>/jrdbpose_<split>_part<N>.pkl
+# Output: social-transmotion/data/jrdb_all_visual_cues/original_pose/<split>/jrdbpose_<split>_part<N>.pkl
 ```
 
 ### 3.3 Build the action-label dictionary
@@ -201,7 +208,7 @@ cd ..
 | Script | Purpose | Input | Output |
 |---|---|---|---|
 | `social-transmotion/load_jta_3dpose.py` | Extract per-pedestrian 3D pose for SMPL fit | preprocess shards | `data/jta_all_visual_cues/original_pose/<split>/*.pkl` |
-| `social-transmotion/load_jrdb_3dpose.py` | Extract per-pedestrian 3D pose for SMPL fit | preprocess shards | `data/jrdb_3dpose/original_pose/<split>/*.pkl` |
+| `social-transmotion/load_jrdb_3dpose.py` | Extract per-pedestrian 3D pose for SMPL fit | preprocess shards | `data/jrdb_all_visual_cues/original_pose/<split>/*.pkl` |
 | `social-transmotion/load_jta_traj.py` | PACER trajectory cache (JTA) | preprocess shards | `data/saved_trajs/jta_*_trajs.pkl` |
 | `social-transmotion/load_jrdb_traj.py` | PACER trajectory cache (JRDB) | preprocess shards | `data/saved_trajs/jrdb_*_trajs_filterv2.pkl` |
 | `joints2smpl/Pose_to_SMPL/fit/tools/main.py` | Per-pedestrian SMPL fitting | `original_pose/` + SMPL body model | `fit/output/<dataset>_cross_fixed/...` |

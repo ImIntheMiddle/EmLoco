@@ -9,7 +9,6 @@ import tqdm
 import matplotlib.pyplot as plt
 
 
-
 def read_json(file_path):
     with open(file_path, "r") as f:
         data = json.load(f)
@@ -120,7 +119,7 @@ def main(opt):
     }
     posedict = load_jrdb_3dpose(opt.hst_dir, sequence[opt.split])
 
-    save_dir = f"data/jrdb_3dpose/original_pose/{opt.split}"
+    save_dir = f"data/jrdb_all_visual_cues/original_pose/{opt.split}"
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
 
