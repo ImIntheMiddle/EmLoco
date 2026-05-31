@@ -163,8 +163,13 @@ parser.add_argument("--valueloss_w", type=float, default=0)
 parser.add_argument(
     "--value_path",
     type=str,
-    default="valuenet_realpath_JTA+JRDB_valuenet_00025000.pth",
-    help="Path to the value network checkpoint (under --value_dir).",
+    default="valuenet_realpath_JTA+JRDB_nopose_valuenet_00025000.pth",
+    help=(
+        "Path to the value network checkpoint (under --value_dir). EqMotion uses "
+        "the no-pose `ValuePoseNet` variant (fc1: 13→28); for the trajectory "
+        "predictor (`social-transmotion/train_*.py`), use the full "
+        "`valuenet_realpath_JTA+JRDB_valuenet_00025000.pth` instead."
+    ),
 )
 parser.add_argument(
     "--value_dir",
