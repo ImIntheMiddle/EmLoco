@@ -1,31 +1,28 @@
 """load 3d pose from JTA dataset, and save them as pkl files"""
 
 import os
-import sys
-import json
 import pickle
 import argparse
 import numpy as np
-import torch
 import tqdm
 
-from utils.utils import path_to_data
-from utils.trajnetplusplustools import Reader_jta_all_visual_cues, Reader_jrdb_2dbox
-from utils.data import load_data_jta_all_visual_cues, prepare_data
 
 
 def load_jta_3dpose(opt):
     datalist = []
     dataset_name = "jta_all_visual_cues"
-    load_bar = tqdm.tqdm(os.listdir(f"data/{dataset_name}/preprocess/{opt.split}"))
+    # Filter to .pkl shards: the upstream Social-Transmotion preprocess writes
+    # .pkl, but stray .pt files from downstream steps may coexist in the same
+    # directory and would otherwise crash pickle.load.
+    preprocess_dir = f"data/{dataset_name}/preprocess/{opt.split}"
+    files = sorted(f for f in os.listdir(preprocess_dir) if f.endswith(".pkl"))
+    load_bar = tqdm.tqdm(files)
     for part, file in enumerate(load_bar):
-        with open(f"data/{dataset_name}/preprocess/{opt.split}/{file}", 'rb') as f:
+        with open(f"{preprocess_dir}/{file}", "rb") as f:
             datalist.append(pickle.load(f))
-            # print(f"Loaded {len(self.datalist)} tracks")
             load_bar.set_description(f"Loaded {len(datalist)} tracks")
-        # if part == 0:
-        #     break
     return datalist
+
 
 def main(opt):
     datalist = load_jta_3dpose(opt)
@@ -47,17 +44,23 @@ def main(opt):
                 keylist.append(f"part{part}_scene{scene_id}_person{person_id}")
                 poselist.append(pose_3d.numpy())
         # import pdb; pdb.set_trace()
-        posearray = np.array(poselist) # (n, 21, 22, 3)
-        posedict = {'keylist': keylist, 'posearray': posearray}
+        posearray = np.array(poselist)  # (n, 21, 22, 3)
+        posedict = {"keylist": keylist, "posearray": posearray}
 
-        with open(f"{save_dir}/jtapose_{opt.split}_part{part}.pkl", 'wb') as f:
+        with open(f"{save_dir}/jtapose_{opt.split}_part{part}.pkl", "wb") as f:
             pickle.dump(posedict, f)
         print(f"Processed {len(keylist)} seqs")
         print(f"Saved to {save_dir}/jtapose_{opt.split}_part{part}.pkl")
         print(f"Part {part} finished!")
 
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--split", type=str, default="test", help="Split to use. one of [train, test, val]")
+    parser.add_argument(
+        "--split",
+        type=str,
+        default="test",
+        help="Split to use. one of [train, test, val]",
+    )
     opt = parser.parse_args()
     main(opt)
