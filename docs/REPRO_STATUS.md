@@ -19,12 +19,12 @@ Legend: ✅ verified end-to-end · 🟡 smoke only (startup / partial range) · 
 
 | # | Step | Status | Notes |
 |---|---|---|---|
-| 5 | JTA upstream preprocess (`raw → preprocess/*.pkl`) | 🔴 | Out of scope (upstream Social-Transmotion responsibility); doc points at upstream repo |
-| 6 | JRDB upstream preprocess (`raw + JRDB-Traj → jrdb_2dbox/preprocess/*.pkl`) | 🔴 | Same — upstream-only; not bundled |
+| 5 | JTA upstream preprocess (`raw → preprocess/*.pkl`) | 🟡 | Upstream Social-Transmotion does **not** ship a preprocess script — they release per-sequence `.ndjson` files in [`ckpt_data`](https://github.com/vita-epfl/social-transmotion/releases/tag/ckpt_data). EmLoco's `dataset_jta.py initialize()` chunks them into our `.pkl` shards. Verified by running `JtaAllVisualCuesDataset(preprocessed=False)` on upstream `releases.zip/val/`: 3565 tracks produced. Content differs from the plausibl reference (different per-scene people counts), so byte-equivalence is **not** guaranteed — the pipeline is functional but not byte-locked to the released checkpoint's training set. |
+| 6 | JRDB upstream preprocess (`raw + JRDB-Traj → jrdb_2dbox/preprocess/*.pkl`) | 🟡 | Same recipe as #5; upstream `releases.zip/jrdb/data/` ndjsons → `Jrdb2dboxDataset(preprocessed=False)` writes `preprocess/<split>/part_<N>.pkl`. Smoke-tested on the same upstream archive; not byte-locked to the released checkpoint's training set for the same reason as JTA. |
 | 7 | `load_jta_3dpose.py` (val) → `original_pose/` | ✅ | Output `(40319, 21, 22, 3)`, identical to plausibl-side ground truth (NaN-aware) |
-| 8 | `load_jta_3dpose.py` (train + test) | 🔴 | Same code path as val; trivial replay |
+| 8 | `load_jta_3dpose.py` (train + test) | ✅ | Replayed on the full plausibl preprocess: train 18 shards, test 2 shards |
 | 9 | `load_jrdb_3dpose.py` (val, JRDB labels_3d) | ✅ | Output `(4122, 21, 33, 3)`, byte-equivalent to plausibl-side (max diff 0) |
-| 10 | `load_jrdb_3dpose.py` (train + test) | 🔴 | Same code path as val |
+| 10 | `load_jrdb_3dpose.py` (train + test) | ✅ | Replayed on plausibl `labels_3d/`: train 4 shards (89819 seqs), test 2 shards (26594 seqs) |
 | 11 | `create_action_dict.py` | ✅ | 13800 frame entries, byte-equivalent to HF `action_dict.json` |
 | 12 | `main.py --dataset_name JTA --save_params` | 🟡 | Verified on `val/part_0` for batches 0–9 (loss curve healthy, params written); train (~10 GPU-hours) deferred |
 | 13 | `main.py --dataset_name JRDB --save_params` | 🟡 | Verified on `test/part_0` batch 0 partial; same code path as JTA |
@@ -55,7 +55,7 @@ Legend: ✅ verified end-to-end · 🟡 smoke only (startup / partial range) · 
 |---|---|---|---|
 | 29 | Raw ETH/UCY → `eth_ucy/data/<dataset>/<seq>.txt` | 🔴 | External AgentFormer dump, doc'd in `EqMotion/README.md` |
 | 30 | `process_eth_data_diverse.py --subset eth` | ✅ | 4 `.npy` outputs in `eth_ucy/processed_data_diverse/` |
-| 31 | `process_eth_data_diverse.py` other subsets | 🔴 | Same code path as `eth`; trivial replay |
+| 31 | `process_eth_data_diverse.py` other subsets | ✅ | All 5 subsets (eth, hotel, univ, zara1, zara2) produced their 4 `.npy` outputs |
 | 32 | `main_eth_diverse.py --subset eth --test` | 🟡 | Loads released valuenet ckpt successfully; full training/eval not run |
 | 33 | EqMotion full train (60 epochs × 5 subsets) | 🔴 | Hours per subset |
 

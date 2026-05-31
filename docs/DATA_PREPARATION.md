@@ -63,13 +63,24 @@ All commands below assume the repository root as CWD unless `cd` is shown.
 
 ### 2.1 Build the Social-Transmotion `.pkl` shards (J=49)
 
-> [!Note]
-> The JTA preprocessing script is **not** bundled here. Follow the recipe in the [upstream Social-Transmotion repo](https://github.com/vita-epfl/social-transmotion) to produce the J=49 `.pkl` shards.
->
-> Expected output layout:
-> ```
-> social-transmotion/data/jta_all_visual_cues/preprocess/{train,val,test}/part_<N>.pkl
-> ```
+Upstream Social-Transmotion ships per-sequence `.ndjson` files in a [GitHub Release](https://github.com/vita-epfl/social-transmotion/releases/tag/ckpt_data); EmLoco's `dataset_jta.py` then chunks them into `preprocess/*.pkl` shards on first instantiation with `preprocessed=False`.
+
+```bash
+# 1. Stage upstream's per-sequence ndjsons under social-transmotion/data/jta_all_visual_cues/
+#    (unzip releases.zip from the upstream tag above; place its `jta/data/{train,val,test}/`
+#     subdir at social-transmotion/data/jta_all_visual_cues/{train,val,test}/)
+
+# 2. Trigger one-time chunking (writes 5000-track .pkl shards):
+cd social-transmotion
+python -c "
+from dataset_jta import JtaAllVisualCuesDataset
+for split in ['train', 'val', 'test']:
+    JtaAllVisualCuesDataset(split=split, track_size=21, track_cutoff=9,
+        segmented=True, add_flips=False, preprocessed=False)
+"
+cd ..
+# Output: social-transmotion/data/jta_all_visual_cues/preprocess/{train,val,test}/part_<N>.pkl
+```
 
 ### 2.2 Extract per-pedestrian 3D pose (`original_pose/`)
 
@@ -131,13 +142,19 @@ cd ..
 
 ### 3.1 Build the Social-Transmotion `.pkl` shards
 
-> [!Note]
-> Neither the JRDB nor the JRDB-Act preprocessing scripts are bundled in this repo (and as of writing there is no single JRDB script in the [upstream Social-Transmotion repo](https://github.com/vita-epfl/social-transmotion) either). Follow Social-Transmotion's overall recipe together with the [JRDB-Traj](https://github.com/vita-epfl/JRDB-Traj) reference (raw scenes from [jrdb.erc.monash.edu](https://jrdb.erc.monash.edu/)) to assemble the J=26 base shards.
->
-> Expected output layout:
-> ```
-> social-transmotion/data/jrdb_2dbox/preprocess/{train,val,test}/part_<N>.pkl
-> ```
+Same one-step recipe as JTA — stage upstream's per-scene `.ndjson` files (from the same [Social-Transmotion releases.zip](https://github.com/vita-epfl/social-transmotion/releases/tag/ckpt_data); its `jrdb/data/{train,val,test}/` subdir) under `social-transmotion/data/jrdb_2dbox/`, then trigger `Jrdb2dboxDataset(preprocessed=False)` once to chunk them into `preprocess/{split}/part_<N>.pkl` shards.
+
+```bash
+cd social-transmotion
+python -c "
+from dataset_jrdb import Jrdb2dboxDataset
+for split in ['train', 'val', 'test']:
+    Jrdb2dboxDataset(name='jrdb_all_visual_cues', split=split, track_size=21,
+        track_cutoff=9, segmented=True, add_flips=False, preprocessed=False)
+"
+cd ..
+# Output: social-transmotion/data/jrdb_2dbox/preprocess/{train,val,test}/part_<N>.pkl
+```
 
 ### 3.2 Extract per-pedestrian 3D pose (`original_pose/`)
 
