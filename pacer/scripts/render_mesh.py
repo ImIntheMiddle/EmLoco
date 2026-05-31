@@ -4,6 +4,10 @@ mesh asset (`data/mesh/<name>.pkl`).
 Originally a one-off internal script with hardcoded paths to author-local
 .obj files; reworked to be argparse-driven so a third party can point it
 at any source mesh.
+
+Note: not part of the default pipeline, so its `pyrender` / `trimesh`
+dependencies are not in pyproject.toml. Install them manually before use:
+    pip install pyrender trimesh
 """
 
 import argparse

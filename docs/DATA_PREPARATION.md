@@ -52,7 +52,7 @@ social-transmotion/data/jrdb_2dbox/preprocess/{train,val,test}/part_<N>.pkl
 |---|---|---|
 | Raw JTA videos + annotations | [JTA-Dataset](https://github.com/fabbrimatteo/JTA-Dataset) | Registration required |
 | Raw JRDB sequences | [jrdb.erc.monash.edu](https://jrdb.erc.monash.edu/) | Registration required |
-| JRDB 3D pose JSONs (HST format) | [JRDB-Pose](https://jrdb.erc.monash.edu/dataset/pose) → preprocessed via [human-scene-transformer](https://github.com/google-research/human-scene-transformer/tree/main/human_scene_transformer/data) | `load_jrdb_3dpose.py` expects per-scene JSONs with a `labels` key (HST output format), not the raw JRDB-Pose detections |
+| JRDB-Act 3D labels | [JRDB Activity](https://jrdb.erc.monash.edu/dataset/activity) `train_dataset_with_activity/labels/labels_3d/` | Per-scene `<scene>.json` with a `labels` key (`label_id`, `box`, `social_activity`, ...) consumed by `load_jrdb_3dpose.py` |
 | JRDB-Act action labels | [JRDB Activity](https://jrdb.erc.monash.edu/dataset/activity) | `labels_2d_stitched/` is the input we consume |
 | SMPL body models v1.1.0 | [smpl.is.tue.mpg.de](https://smpl.is.tue.mpg.de/) | Place per the main [README §SMPL body models](../README.md#smpl-body-models) |
 | Working `uv sync` env | This repo | See main [README §Installation](../README.md#installation) |
@@ -141,16 +141,14 @@ cd ..
 
 ### 3.2 Extract per-pedestrian 3D pose (`original_pose/`)
 
-Required input for the SMPL fit step (3.4).
-
-> [!Important]
-> `load_jrdb_3dpose.py` reads **HST-formatted** per-scene JSONs (each file has a `"labels"` key) — not the raw JRDB-Pose detections. Run [human-scene-transformer](https://github.com/google-research/human-scene-transformer/tree/main/human_scene_transformer/data)'s preprocessing on JRDB-Pose first to produce that format, then point `--hst_dir` at the resulting directory.
+Required input for the SMPL fit step (3.4). Point `--hst_dir` at JRDB-Act's `labels_3d/` directory (legacy argname; the script reads per-scene `<scene>.json` with a `"labels"` key, which JRDB-Act ships natively — no external preprocessing needed).
 
 ```bash
 cd social-transmotion
-python load_jrdb_3dpose.py --split train --hst_dir <path-to-HST-JSONs>
-python load_jrdb_3dpose.py --split val   --hst_dir <path-to-HST-JSONs>
-python load_jrdb_3dpose.py --split test  --hst_dir <path-to-HST-JSONs>
+LABELS_3D=<path-to-jrdb-act>/train_dataset_with_activity/labels/labels_3d
+python load_jrdb_3dpose.py --split train --hst_dir "$LABELS_3D"
+python load_jrdb_3dpose.py --split val   --hst_dir "$LABELS_3D"
+python load_jrdb_3dpose.py --split test  --hst_dir "$LABELS_3D"
 cd ..
 # Output: social-transmotion/data/jrdb_all_visual_cues/original_pose/<split>/jrdbpose_<split>_part<N>.pkl
 ```

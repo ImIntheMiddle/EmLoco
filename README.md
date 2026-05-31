@@ -87,7 +87,7 @@ ln -s "$PWD/.assets/checkpoints/valuenets/valuenet_realpath_JTA+JRDB_nopose_valu
 ln -s "$PWD/.assets/action_dict.json" joints2smpl/Pose_to_SMPL/action_dict.json
 ```
 
-> Want to rebuild everything from raw datasets? See **[docs/DATA_PREPARATION.md](docs/DATA_PREPARATION.md)** for the full pipeline.
+> Want to rebuild everything from raw datasets? See **[docs/DATA_PREPARATION.md](docs/DATA_PREPARATION.md)** for the full pipeline. Reproduction status of every pipeline step (verified / smoke / deferred) is tracked in **[docs/REPRO_STATUS.md](docs/REPRO_STATUS.md)**.
 
 ## 🚀Quick Start
 
