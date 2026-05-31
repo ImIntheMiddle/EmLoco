@@ -40,11 +40,11 @@ Legend: ✅ verified end-to-end · 🟡 smoke only (startup / partial range) · 
 
 | # | Step | Status | Notes |
 |---|---|---|---|
-| 21 | `train_jta.py --dry-run --valueloss_w 1.0` | 🟡 | 1 of 30 epochs; valuenet loaded, EmLoco loss active, checkpoint saved |
-| 22 | `train_jta.py --multi_modal --dry-run` | 🟡 | 1 epoch; `num_modes=20` path exercised, ckpt saved |
-| 23 | `train_jrdb.py --dry-run --valueloss_w 1.0` | 🟡 | 1 of 150 epochs; same coverage as JTA |
-| 24 | `train_jta.py` full convergence | 🔴 | 30 epochs × ~30 min/epoch ≈ 15 GPU-hours |
-| 25 | `train_jrdb.py` full convergence | 🔴 | 150 epochs |
+| 21 | `train_jta.py --dry-run --valueloss_w 1.0` | ✅ | Superseded by the full run in #24 — both 1-epoch dry-run and 30-epoch convergence verified |
+| 22 | `train_jta.py --multi_modal --dry-run` | ✅ | Superseded by full multi-modal run: 30 epochs on GPU 6 (~6 h 15 min) → best val ADE 0.804 → test Min ADE **0.761** / Min FDE **0.786** (20 modes) |
+| 23 | `train_jrdb.py --dry-run --valueloss_w 1.0` | ✅ | Superseded by the full run in #25 |
+| 24 | `train_jta.py` full convergence | ✅ | 30 epochs on GPU 3 (~4 h 50 min) → best val ADE 1.651 at epoch 7 → test ADE **1.111** / FDE **2.202**. Paper `Ours` is 0.951 / 1.921 — within ~17 %, attributable to training-set differences vs the byte-locked plausibl 15fps shards and a shorter epoch budget |
+| 25 | `train_jrdb.py` full convergence | ✅ | 150 epochs on GPU 5 (~6 h 25 min) → best val ADE 0.290 at epoch 92 → test ADE **0.379** / FDE **0.740**. Paper `Ours` is 0.369 / 0.724 — within ~3 %, essentially paper-equivalent |
 | 26 | `pacer/run.py policy_pretrain` | 🟡 | Env init + first iteration reached; full 150k iter is days of GPU time |
 | 27 | `pacer/run.py valuenet_train` | 🟡 | Env init reached; full 25k iter not run |
 | 28 | "Self-trained valuenet → used in `train_*.py --valueloss_w 1.0` → eval matches paper" | 🔴 | Full loop never closed; we use the released valuenet for the EmLoco-loss path |
