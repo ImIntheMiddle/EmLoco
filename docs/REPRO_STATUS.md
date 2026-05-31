@@ -47,7 +47,7 @@ Legend: ✅ verified end-to-end · 🟡 smoke only (startup / partial range) · 
 | 25 | `train_jrdb.py` full convergence | ✅ | 150 epochs on GPU 5 (~6 h 25 min) → best val ADE 0.290 at epoch 92 → test ADE **0.379** / FDE **0.740**. Paper `Ours` is 0.369 / 0.724 — within ~3 %, essentially paper-equivalent |
 | 26 | `pacer/run.py policy_pretrain` (startup) | ✅ | Env init + AMP humanoid asset load + training loop entered (0/15 envs ready). Full 150k iter is split out as #28 |
 | 27 | `pacer/run.py valuenet_train` (startup) | ✅ | Env init reached with `--load_path` on a sample policy ckpt. Full 25k iter convergence is part of #28 |
-| 28 | "Self-trained valuenet → used in `train_*.py --valueloss_w 1.0` → eval matches paper" | 🔴 | Full loop never closed; we use the released valuenet for the EmLoco-loss path |
+| 28 | "Self-trained valuenet → used in `train_*.py --valueloss_w 1.0` → eval matches paper" | 🔴 | Attempted in this session: launched `policy_pretrain` with `num_envs ∈ {2, 64, 128, 512}` on a free RTX 6000 Ada. After env init + AMP load + `Started to train`, the first rollout (`horizon_length=32`) never completed — process holds steady at ~30–90 % CPU / 5 GB RSS for many minutes with no progress past `0/31`. Likely a combination of (a) the 18 GB `saved_trajs/jta_*_trajs.pkl` cache being repeatedly sampled per rollout, (b) Isaac Gym physics step cost on shared GPU, and (c) wandb-redirected stdout buffering hiding any per-step output. Even if iter 1 eventually unblocks, 150k iter is multi-day. Recommend revisiting with a smaller `saved_trajs` shard or in a less-shared GPU + dedicated wandb-off run |
 
 ## EqMotion ETH/UCY (alternative backbone)
 
