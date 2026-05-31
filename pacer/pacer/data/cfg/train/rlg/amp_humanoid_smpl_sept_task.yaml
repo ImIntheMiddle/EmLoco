@@ -139,4 +139,4 @@ params:
       # valuenet_path: "output/exp/pacer/valuenet_realpath_JTA+JRDB_nopose_valuenet_00025000.pth"
       # valuenet_path: "output/exp/pacer/valuenet_realpath_JTA+JRDB_novel_valuenet_00025000.pth"
       # valuenet_path: "output/exp/pacer/valuenet_realpath_JTA+JRDBonly_noalign_valuenet_00025000.pth"
-      valuenet_path: "output/exp/pacer/valuenet_1106_discount_hybrid_full_valuenet_00025000.pth"
+      valuenet_path: "output/exp/pacer/valuenet_realpath_JTA+JRDB_valuenet_00025000.pth"

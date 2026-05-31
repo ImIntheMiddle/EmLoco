@@ -78,11 +78,14 @@ mkdir -p social-transmotion/experiments/JTA/jta_ours social-transmotion/experime
 ln -s "$PWD/.assets/checkpoints/jta_ours"  social-transmotion/experiments/JTA/jta_ours/checkpoints
 ln -s "$PWD/.assets/checkpoints/jrdb_ours" social-transmotion/experiments/JRDB/jrdb_ours/checkpoints
 
+# LocoVal value-network checkpoints (~34 KB, used by evaluate_*.py and train_*.py with --valueloss_w)
+mkdir -p pacer/output/exp/pacer
+ln -s "$PWD/.assets/checkpoints/valuenets/valuenet_realpath_JTA+JRDB_valuenet_00025000.pth"        pacer/output/exp/pacer/
+ln -s "$PWD/.assets/checkpoints/valuenets/valuenet_realpath_JTA+JRDB_nopose_valuenet_00025000.pth" pacer/output/exp/pacer/
+
 # Per-action ADE/FDE breakdown (5.5 MB, optional)
 ln -s "$PWD/.assets/action_dict.json" joints2smpl/Pose_to_SMPL/action_dict.json
 ```
-
-Also place the **LocoVal value-network checkpoint** (from the GitHub Release [`checkpoints`](https://github.com/ImIntheMiddle/EmLoco/releases/tag/checkpoints)) at `pacer/output/exp/pacer/valuenet_realpath_JTA+JRDB_valuenet_00025000.pth` — this is the default referenced by `social-transmotion/evaluate_*.py` and the EmLoco-loss training scripts.
 
 > Want to rebuild everything from raw datasets? See **[docs/DATA_PREPARATION.md](docs/DATA_PREPARATION.md)** for the full pipeline.
 
@@ -127,7 +130,9 @@ python visualize_pred.py --save_name jta_ours_vis
 Requires Isaac Gym binaries + SMPL (above). Two-stage training: pretrain a locomotion policy, then a value head on top.
 
 ```bash
-# Pre-step 1: PACER sample data (AMASS shapes, neutral pose, occlusions)
+# Pre-step 1: PACER sample data (AMASS shapes, standing-upright pose, occlusions) — populates
+# pacer/sample_data/{amass_isaac_gender_betas_unique.pkl, amass_isaac_standing_upright_slim.pkl,
+#                    amass_copycat_occlusion_v2.pkl} via gdown
 cd pacer && bash download_data.sh && cd ..
 
 # Pre-step 2: trajectory caches (PACER uses the same JTA/JRDB trajectories as Social-Transmotion)

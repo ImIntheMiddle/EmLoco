@@ -93,11 +93,25 @@ We provide our trained models in "h36m/saved_models" and the overall average res
 
 ## Pedestrian Trajectory
 ### Data preparation
-To preprocess the raw data to .npy file, run
+First fetch the raw ETH/UCY trajectories in AgentFormer's per-scene `.txt` format and place them at `eth_ucy/data/<dataset>/<seq>.txt`. The canonical source is [AgentFormer's `datasets/eth_ucy/`](https://github.com/Khrylx/AgentFormer/tree/main/datasets/eth_ucy); see also [SocialGAN's `datasets/`](https://github.com/agrimgupta92/sgan/tree/master/datasets) for an equivalent dump.
+
+Expected layout:
+
+```
+eth_ucy/data/
+├── eth/   {biwi_eth, biwi_hotel_{train,val}, crowds_zara0{1,2}_{train,val}, students00{1,3}_{train,val}, uni_examples_{train,val}}.txt
+├── hotel/ ...
+├── univ/  ...
+├── zara1/ ...
+└── zara2/ ...
+```
+
+Then preprocess to `.npy`:
 
 ```
 cd eth_ucy/
 python process_eth_data_diverse.py --subset {subset_name}
+# Output: eth_ucy/processed_data_diverse/{subset_name}_{data,num}_{train,test}.npy
 ```
 ### Run experiments
 To train, run
