@@ -661,7 +661,7 @@ class HumanoidAMP(Humanoid):
             self._hack_motion_time = 0.0
 
         num_motions = self._motion_lib.num_motions()
-        motion_ids = np.arange(self.num_envs, dtype=np.int)
+        motion_ids = np.arange(self.num_envs, dtype=int)
         motion_ids = np.mod(motion_ids, num_motions)
         # motion_ids[:] = 2
         motion_times = torch.tensor([self._hack_motion_time] * self.num_envs,
@@ -754,7 +754,7 @@ class HumanoidAMP(Humanoid):
         if (not hasattr(self, "_hack_motion_time")):
             self._hack_motion_time = 0.0
 
-        motion_ids = np.array([0] * self.num_envs, dtype=np.int)
+        motion_ids = np.array([0] * self.num_envs, dtype=int)
         motion_times = np.array([self._hack_motion_time] * self.num_envs)
         root_pos, root_rot, dof_pos, root_vel, root_ang_vel, dof_vel, key_pos \
            = self._motion_lib.get_motion_state(motion_ids, motion_times)

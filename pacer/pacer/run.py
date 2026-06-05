@@ -372,9 +372,14 @@ def main():
     cfg_train["params"]["config"]["train_dir"] = args.log_path  # jp hack fix this asap
     cfg_train["params"]["config"]["train_mode"] = args.train
 
-    # load the weights
-    if args.load_path is not None:
+    # load the weights. Argparse default for --load_path is "" (not None), and the YAML
+    # ships load_checkpoint: True — so an empty --load_path with default --epoch (=0) would
+    # cause rl_games to print params['load_path'] and then agent.restore('') → IO error.
+    # Disable the restore path entirely when no checkpoint was requested.
+    if args.load_path:
         cfg_train["params"]["load_path"] = args.load_path
+    elif args.epoch == 0:
+        cfg_train["params"]["load_checkpoint"] = False
 
     os.makedirs(args.network_path, exist_ok=True)
     os.makedirs(args.log_path, exist_ok=True)
