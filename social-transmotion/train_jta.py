@@ -510,6 +510,21 @@ def train(
             continue
         start = time.time()
         loss.backward()
+        # A finite loss can still produce non-finite gradients (e.g. softmax overflow in
+        # attention with long sequences).  optimizer.step() with NaN gradients permanently
+        # corrupts every parameter; clip_grad_norm only rescales norm, it does not sanitize
+        # NaNs.  Check explicitly and skip the step instead.
+        grad_finite = all(
+            torch.isfinite(p.grad).all().item()
+            for p in model.parameters()
+            if p.grad is not None
+        )
+        if not grad_finite:
+            print(
+                f"[epoch {epoch} step {i}] non-finite gradient detected, skipping step"
+            )
+            optimizer.zero_grad(set_to_none=True)
+            continue
         torch.nn.utils.clip_grad_norm_(
             model.parameters(), config["TRAIN"]["max_grad_norm"]
         )
