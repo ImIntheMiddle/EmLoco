@@ -136,15 +136,15 @@ def evaluate_loss(
                         pred_traj, primary_init_pose, primary_init_vel
                     )
                     value_loss *= config["TRAIN"]["valuenet_weight"]
-                # loss = (1-config["TRAIN"]["valuenet_weight"]) * loss + value_loss.mean() if not torch.isnan(value_loss.mean()) else loss
-
-                # import pdb; pdb.set_trace()
-                if len(value_loss[~torch.isnan(value_loss)]) > 0:
+                # Filter both NaN and Inf — calc_embodied_motion_loss returns MSE,
+                # which can produce Inf when pred_value drifts large during training.
+                finite_mask = torch.isfinite(value_loss)
+                if finite_mask.any():
+                    finite_value_loss = value_loss[finite_mask]
                     value_loss_avg.update(
-                        value_loss[~torch.isnan(value_loss)].mean().item(),
-                        len(value_loss[~torch.isnan(value_loss)]),
+                        finite_value_loss.mean().item(), len(finite_value_loss)
                     )
-                    loss = loss + value_loss[~torch.isnan(value_loss)].mean()
+                    loss = loss + finite_value_loss.mean()
 
             loss_avg.update(loss.item(), len(in_joints))
 
@@ -334,6 +334,7 @@ def train(
         if config["VAL_LOSS_ONLY"]:
             mse_loss *= 0
         loss = mse_loss.clone()
+        finite_value_loss = None
         if valuenet is not None:
             if config["MULTI_MODAL"]:
                 pred_trajs = pred_joints[:, in_F:]
@@ -382,20 +383,41 @@ def train(
 
                 value_loss *= config["TRAIN"]["valuenet_weight"]
 
-                if len(value_loss[~torch.isnan(value_loss)]) > 0:
-                    value_loss_avg.update(
-                        value_loss[~torch.isnan(value_loss)].mean().item(),
-                        len(value_loss[~torch.isnan(value_loss)]),
-                    )
-                    loss = loss + value_loss[~torch.isnan(value_loss)].mean()
+                # Filter both NaN and Inf — same rationale as evaluate_loss path.
+                finite_mask = torch.isfinite(value_loss)
+                finite_value_loss = (
+                    value_loss[finite_mask] if finite_mask.any() else None
+                )
+                if finite_value_loss is not None and len(finite_value_loss) > 0:
+                    loss = loss + finite_value_loss.mean()
 
         timer["FORWARD"] = time.time() - start
 
         ################################
         # Backward Pass + Optimization
         ################################
+        # Guard against rare numerical explosions that survive per-element filtering —
+        # backprop on a NaN/Inf scalar corrupts every weight via the gradient.
+        if not torch.isfinite(loss):
+            print(
+                f"[epoch {epoch} step {i}] non-finite loss detected (mse={mse_loss.item():.4f}), skipping batch"
+            )
+            optimizer.zero_grad(set_to_none=True)
+            continue
         start = time.time()
         loss.backward()
+        # A finite loss can still produce non-finite gradients (e.g. softmax overflow).
+        grad_finite = all(
+            torch.isfinite(p.grad).all().item()
+            for p in model.parameters()
+            if p.grad is not None
+        )
+        if not grad_finite:
+            print(
+                f"[epoch {epoch} step {i}] non-finite gradient detected, skipping step"
+            )
+            optimizer.zero_grad(set_to_none=True)
+            continue
         torch.nn.utils.clip_grad_norm_(
             model.parameters(), config["TRAIN"]["max_grad_norm"]
         )
@@ -409,11 +431,13 @@ def train(
 
         loss_avg.update(loss.item(), len(joints))
         mse_loss_avg.update(mse_loss.item(), len(joints))
-        if (valuenet is not None) and len((~torch.isnan(value_loss)).shape) > 0:
-            # update with non-nan values
+        if (
+            valuenet is not None
+            and finite_value_loss is not None
+            and len(finite_value_loss) > 0
+        ):
             value_loss_avg.update(
-                value_loss[~torch.isnan(value_loss)].mean().item(),
-                len(value_loss[~torch.isnan(value_loss)]),
+                finite_value_loss.mean().item(), len(finite_value_loss)
             )
 
         summary = [
