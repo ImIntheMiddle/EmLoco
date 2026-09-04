@@ -7,11 +7,9 @@ sys.path.append(
 import argparse
 from datetime import datetime
 import numpy as np
-import os
 import random
 import time
 import torch
-import optuna
 
 from progress.bar import Bar
 from torch.utils.data import DataLoader, ConcatDataset
@@ -406,21 +404,17 @@ def train(
             continue
         start = time.time()
         loss.backward()
-        # A finite loss can still produce non-finite gradients (e.g. softmax overflow).
-        grad_finite = all(
-            torch.isfinite(p.grad).all().item()
-            for p in model.parameters()
-            if p.grad is not None
+        grad_norm = torch.nn.utils.clip_grad_norm_(
+            model.parameters(), config["TRAIN"]["max_grad_norm"]
         )
-        if not grad_finite:
+        # The clipped norm is non-finite iff some gradient is, so this reuses a reduction
+        # that runs anyway instead of scanning every parameter.
+        if not torch.isfinite(grad_norm):
             print(
                 f"[epoch {epoch} step {i}] non-finite gradient detected, skipping step"
             )
             optimizer.zero_grad(set_to_none=True)
             continue
-        torch.nn.utils.clip_grad_norm_(
-            model.parameters(), config["TRAIN"]["max_grad_norm"]
-        )
         optimizer.step()
 
         timer["BACKWARD"] = time.time() - start
@@ -662,9 +656,6 @@ if __name__ == "__main__":
         help="Add noise to the trajectory to mimic real data",
     )
     parser.add_argument(
-        "--use_hypara_best", action="store_true", help="Use the best hyperparameters"
-    )
-    parser.add_argument(
         "--multi_modal", action="store_true", help="Use multimodal model"
     )
     parser.add_argument(
@@ -685,7 +676,7 @@ if __name__ == "__main__":
 
     cfg["dry_run"] = args.dry_run
     cfg["RESUME"] = args.resume
-    cfg["USE_VALUELOSS"] = args.valueloss_w > 0 or args.use_hypara_best
+    cfg["USE_VALUELOSS"] = args.valueloss_w > 0
     cfg["USE_POSE"] = not args.not_pose
     cfg["USE_VELOCITY"] = not args.not_vel
     cfg["USE_FRAME_MASK"] = args.frame_mask
@@ -693,14 +684,7 @@ if __name__ == "__main__":
     cfg["MULTI_MODAL"] = args.multi_modal
     cfg["VAL_LOSS_ONLY"] = args.valueloss_only
     cfg["MODALITY"] = args.modality
-    if args.use_hypara_best:
-        study = optuna.load_study(
-            study_name="my_study",
-            storage="sqlite:///./experiments/JRDB/hypara_dist_v4/study.db",
-        )
-        cfg["TRAIN"]["valuenet_weight"] = study.best_params["valuenet_weight"]
-    else:
-        cfg["TRAIN"]["valuenet_weight"] = args.valueloss_w
+    cfg["TRAIN"]["valuenet_weight"] = args.valueloss_w
 
     if args.value_path != "":
         cfg["MODEL"]["valuenet_checkpoint"] = os.path.join(

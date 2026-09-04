@@ -7,7 +7,6 @@ sys.path.append(
 import argparse
 from datetime import datetime
 import numpy as np
-import os
 import random
 import time
 import torch
@@ -45,7 +44,6 @@ def evaluate_loss(
     dataiter = iter(dataloader)
     model.eval()
     with torch.no_grad():
-        # import pdb; pdb.set_trace()
         for i in range(len(dataloader)):
             try:
                 joints, masks, padding_mask = next(dataiter)
@@ -179,14 +177,11 @@ def compute_loss(
     out_joints = out_joints.to(config["DEVICE"])
     out_masks = out_masks.to(config["DEVICE"])
 
-    # import pdb; pdb.set_trace()
     if torch.isnan(in_joints).any():
-        # print('Nan detected!')
         # masking nan values with zeros
         in_joints = torch.where(
             torch.isnan(in_joints), torch.zeros_like(in_joints), in_joints
         )
-        # import pdb; pdb.set_trace()
 
     # add gaussian noise to the GT trajectory to mimic real data
     if config["NOISY_TRAJ"]:  # gaussian(0, 0.5^2) when NOISY_TRAJ=0.5
@@ -234,7 +229,6 @@ def adjust_learning_rate(optimizer, epoch, config):
 
 
 def nan_handler(pred_traj, init_pose, init_vel):
-    # import pdb; pdb.set_trace()
     if len(pred_traj.shape) == 3:
         nan_mask_traj = torch.isnan(pred_traj).any(dim=1).any(dim=1)
     else:
@@ -244,14 +238,12 @@ def nan_handler(pred_traj, init_pose, init_vel):
 
     nan_mask = nan_mask_traj | nan_mask_pose | nan_mask_vel
     if nan_mask.any():
-        # print(f'{nan_mask.sum()} nan values detected!')
         pred_traj = pred_traj[~nan_mask]
         init_pose = init_pose[~nan_mask]
         init_vel = init_vel[~nan_mask]
 
     pose_zero_mask = torch.all(init_pose == 0, dim=1).all(dim=1)
     if pose_zero_mask.any():
-        # print(f'{pose_zero_mask.sum()} zero pose values detected!')
         pred_traj = pred_traj[~pose_zero_mask]
         init_pose = init_pose[~pose_zero_mask]
         init_vel = init_vel[~pose_zero_mask]
@@ -407,7 +399,6 @@ def train(
             training=True,
         )
         padding_mask = padding_mask.to(config["DEVICE"])
-        # import pdb; pdb.set_trace()
         primary_init_pose = joints[:, 0, 8, 3:27, :3].clone().to(config["DEVICE"])
         # primary_init_pose = in_joints[:, 8, 1:20, :3].detach().clone().to(config["DEVICE"])
         primary_init_pose[..., 2] *= -1  # flip z axis: transformation for jta dataset
@@ -479,7 +470,6 @@ def train(
                     dim=1,
                 )
 
-                # import pdb; pdb.set_trace()
                 pred_traj, primary_init_pose, primary_init_vel = nan_handler(
                     pred_traj, primary_init_pose, primary_init_vel
                 )
@@ -510,24 +500,17 @@ def train(
             continue
         start = time.time()
         loss.backward()
-        # A finite loss can still produce non-finite gradients (e.g. softmax overflow in
-        # attention with long sequences).  optimizer.step() with NaN gradients permanently
-        # corrupts every parameter; clip_grad_norm only rescales norm, it does not sanitize
-        # NaNs.  Check explicitly and skip the step instead.
-        grad_finite = all(
-            torch.isfinite(p.grad).all().item()
-            for p in model.parameters()
-            if p.grad is not None
+        grad_norm = torch.nn.utils.clip_grad_norm_(
+            model.parameters(), config["TRAIN"]["max_grad_norm"]
         )
-        if not grad_finite:
+        # The clipped norm is non-finite iff some gradient is, so this reuses a reduction
+        # that runs anyway instead of scanning every parameter.
+        if not torch.isfinite(grad_norm):
             print(
                 f"[epoch {epoch} step {i}] non-finite gradient detected, skipping step"
             )
             optimizer.zero_grad(set_to_none=True)
             continue
-        torch.nn.utils.clip_grad_norm_(
-            model.parameters(), config["TRAIN"]["max_grad_norm"]
-        )
         optimizer.step()
 
         timer["BACKWARD"] = time.time() - start
@@ -563,8 +546,6 @@ def train(
 
         if config["dry_run"]:
             break
-        # if config['hypara_tune'] and i > train_steps*0.2:
-        # break
 
         if config["VAL_LOSS_ONLY"] and i % 200 == 0:
             val_loss_tmp = evaluate_loss(
@@ -706,6 +687,7 @@ def main(
         if not config["RESUME"]
         else evaluate_loss(model, dataloader_val, valuenet, config) / 100
     )
+    best_epoch = config["RESUME"] if config["RESUME"] else 0
     logger.info(f"Initial validation loss: {min_val_loss:.3f}")
     if valuenet is not None:
         logger.info(
@@ -840,7 +822,6 @@ if __name__ == "__main__":
     cfg["USE_VELOCITY"] = not args.not_vel
     cfg["TRAIN"]["valuenet_weight"] = args.valueloss_w
     cfg["USE_FRAME_MASK"] = args.frame_mask
-    cfg["hypara_tune"] = False
     cfg["NOISY_TRAJ"] = args.noisy_traj
     cfg["MULTI_MODAL"] = args.multi_modal
     cfg["VAL_LOSS_ONLY"] = args.valueloss_only

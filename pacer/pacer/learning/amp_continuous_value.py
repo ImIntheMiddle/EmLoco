@@ -58,7 +58,6 @@ class AMPValueAgent(amp_continuous.AMPAgent):
                 if self.has_central_value:
                     self.experience_buffer.update_data('states', n, self.obs['states'])
 
-                # import pdb; pdb.set_trace()
                 self.obs, rewards, self.dones, infos = self.env_step(res_dict['actions'])
                 inverted_envs = self.vec_env.env.task.inverted
                 rewards[inverted_envs==True] *= (-self.inversion_penalty_scale)
@@ -89,7 +88,6 @@ class AMPValueAgent(amp_continuous.AMPAgent):
                 next_vals *= (1.0 - terminated)
                 self.experience_buffer.update_data('next_values', n, next_vals)
 
-                # import pdb; pdb.set_trace()
                 amp_rewards = self._calc_amp_rewards(infos['amp_obs'])['disc_rewards'].squeeze()
                 self.current_rewards += rewards
                 self.current_lengths += 1
@@ -109,7 +107,6 @@ class AMPValueAgent(amp_continuous.AMPAgent):
                 self.game_combined_rewards += self.current_combined_rewards * (self.done_early | self.over_pred_steps).float()
 
 
-                # import pdb; pdb.set_trace()
                 self.current_combined_rewards = self.current_combined_rewards * not_dones
                 self.discount_coefs = self.discount_coefs * self.gamma # discounting the rewards
                 # reset the discount_coefs for the done envs to 1
@@ -122,7 +119,6 @@ class AMPValueAgent(amp_continuous.AMPAgent):
 
             valid_rewards_idx = torch.nonzero(self.game_combined_rewards, as_tuple=True)
             if self._do_finetune and (len(valid_rewards_idx[0]) > 0):
-                # import pdb; pdb.set_trace()
                 self.init_pose = self.vec_env.env.get_init_pose().to(self.device)
                 self.waypoint_traj = self.vec_env.env.get_waypoint_traj()[:, :13, :].to(self.device)
                 self.init_vel = self.vec_env.env.get_init_vel().to(self.device)
@@ -139,14 +135,12 @@ class AMPValueAgent(amp_continuous.AMPAgent):
                 self.vnet_optimizer.step()
                 self.vnet_optimizer.zero_grad()
                 self.vnet_loss += vnet_loss.item()
-                # import pdb; pdb.set_trace()
                 self.vnet_gt = torch.cat([self.vnet_gt, self.normalized_rewards])
                 self.vnet_pred = torch.cat([self.vnet_pred, valuenet_pred[valid_rewards_idx]])
                 self.game_combined_rewards = torch.zeros_like(self.current_rewards).flatten().to(self.ppo_device)
 
             done_indices = done_indices[:, 0]
 
-        # import pdb; pdb.set_trace()
         with torch.no_grad():
             mb_fdones = self.experience_buffer.tensor_dict['dones'].float()
             mb_values = self.experience_buffer.tensor_dict['values']
@@ -155,8 +149,6 @@ class AMPValueAgent(amp_continuous.AMPAgent):
             mb_rewards = self.experience_buffer.tensor_dict['rewards']
             mb_amp_obs = self.experience_buffer.tensor_dict['amp_obs']
             amp_rewards = self._calc_amp_rewards(mb_amp_obs)
-            # print("amp_rewards: ", amp_rewards)
-            # print("mb_rewards: ", mb_rewards)
             mb_rewards = self._combine_rewards(mb_rewards, amp_rewards)
 
             mb_advs = self.discount_values(mb_fdones, mb_values, mb_rewards, mb_next_values)
@@ -167,7 +159,6 @@ class AMPValueAgent(amp_continuous.AMPAgent):
             batch_dict['played_frames'] = self.batch_size
             batch_dict['terminated_flags'] = terminated_flags
             batch_dict['reward_raw'] = reward_raw/self.horizon_length
-            # import pdb; pdb.set_trace()
 
             for k, v in amp_rewards.items():
                 batch_dict[k] = a2c_common.swap_and_flatten01(v)
@@ -440,7 +431,6 @@ class AMPValueAgent(amp_continuous.AMPAgent):
 
         info = {'task_value_loss': tv_loss}
         tv_loss_mean = torch.mean(tv_loss)
-        # print("tv_loss: ", tv_loss_mean.item())
         return info
 
     def _log_train_info(self, train_info, frame):

@@ -120,7 +120,7 @@ CUDA_VISIBLE_DEVICES={GPU_ID} python main_eth_diverse.py --subset {subset_name}
 ```
 To evaluate, run
 ```
-CUDA_VISIBLE_DEVICES={GPU_ID} python main_eth_diverse.py --subset {subset_name} --test --exp_name valuenet_0.1
+CUDA_VISIBLE_DEVICES={GPU_ID} python main_eth_diverse.py --subset {subset_name} --test
 ```
 ### Results
 We provide our trained models in "eth_ucy/saved_models" and the results (ADE/FDE) of different subsets are reported below.

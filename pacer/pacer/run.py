@@ -10,8 +10,8 @@ import sys
 import os.path as osp
 
 sys.path.append(os.getcwd())
-os.environ["MESA_VK_DEVICE_SELECT"] = "10de:2230"  # dl41
-# os.environ["MESA_VK_DEVICE_SELECT"] = "10de:1b80" # dl32
+# On a multi-GPU host, pin Vulkan to one GPU by exporting MESA_VK_DEVICE_SELECT
+# (e.g. `export MESA_VK_DEVICE_SELECT=10de:2230`) before launching this script.
 
 from utils.config import (
     set_np_formatting,
@@ -307,6 +307,7 @@ def main():
     )
 
     flags.add_proj = args.add_proj
+    flags.graphics_device_id = args.graphics_device_id
 
     if args.server_mode:
         flags.follow = args.follow = True

@@ -146,8 +146,6 @@ class CopycatVisualizer(Visualizer):
     def update_pose(self):
 
         # if self.env_vis.viewer._record_video:
-        #     print(self.fr)
-        # print(self.fr)
         expert = self.agent.env.expert
         lim = self.agent.env.converter.new_nq + (
             expert["obj_pose"].shape[1] if expert["has_obj"] else 0
@@ -180,7 +178,6 @@ class CopycatVisualizer(Visualizer):
         if self.agent.cfg.focus:
             self.env_vis.viewer.cam.lookat[:2] = self.env_vis.data.qpos[:2]
         self.env_vis.sim_forward()
-        # print(self.fr)
         if self.agent.cfg.render_video:
             size = (1920, 1080)
             data = np.asarray(

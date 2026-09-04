@@ -8,7 +8,6 @@ import argparse
 import torch
 from eth_ucy.dataloader_diverse import eth_dataset
 from eth_ucy.model_t import EqMotion
-import os
 from torch import optim
 import json
 import numpy as np
@@ -306,7 +305,6 @@ def main():
     # else:
     #     valuenet = None
 
-    # print(model)
     optimizer = optim.Adam(
         model.parameters(), lr=args.lr, weight_decay=args.weight_decay
     )
@@ -339,7 +337,6 @@ def main():
 
     # if args.vis:
     #     model_path = args.model_save_dir + '/' + args.model_name +'.pth.tar'
-    #     print('Loading model from:', model_path)
     #     model_ckpt = torch.load(model_path)
     #     model.load_state_dict(model_ckpt['state_dict'], strict=False)
     #     test_loss, ade = vis(model, optimizer, 0, loader_test, backprop=False)
@@ -374,9 +371,10 @@ def main():
                     "state_dict": model.state_dict(),
                     "optimizer": optimizer.state_dict(),
                 }
-                os.makedirs(args.model_save_dir, exist_ok=True)
+                save_dir = os.path.join(args.model_save_dir, str(args.subset))
+                os.makedirs(save_dir, exist_ok=True)
                 file_path = os.path.join(
-                    args.model_save_dir, str(args.subset) + "_ckpt_best.pth.tar"
+                    save_dir, str(args.subset) + "_ckpt_best.pth.tar"
                 )
                 torch.save(state, file_path)
             print(
@@ -384,18 +382,6 @@ def main():
                 % (best_test_loss, best_ade, best_epoch)
             )
             print("The seed is :", seed)
-
-            state = {
-                "epoch": epoch,
-                "state_dict": model.state_dict(),
-                "optimizer": optimizer.state_dict(),
-            }
-
-            file_path = os.path.join(
-                args.model_save_dir,
-                str(args.subset) + "_ckpt_" + str(epoch) + ".pth.tar",
-            )
-            # torch.save(state, file_path)
 
     return best_val_loss, best_test_loss, best_epoch
 
@@ -448,7 +434,6 @@ def train(model, optimizer, epoch, loader, valuenet, backprop=True):
             batch_size, agent_num, length, _ = loc.size()
 
             optimizer.zero_grad()
-            # import pdb; pdb.set_trace()
             vel = vel * constant
             nodes = torch.sqrt(torch.sum(vel**2, dim=-1)).detach()
             loc_pred, category = model(nodes, loc.detach(), vel, num_valid)
@@ -477,9 +462,6 @@ def train(model, optimizer, epoch, loader, valuenet, backprop=True):
                         dim=2,
                     )[0]
                 )  # for all agents in the scenes
-                pred_values, value_losses = valuenet.calc_embodied_motion_loss(
-                    pred_trajs[:, :, :], primary_init_pose, primary_init_vel
-                )
             else:
                 loss = torch.mean(
                     torch.min(
@@ -490,27 +472,27 @@ def train(model, optimizer, epoch, loader, valuenet, backprop=True):
                         dim=2,
                     )[0]
                 )  # only for ego agent
-                if valuenet is not None:
-                    pred_trajs = pred_trajs[:, 0].permute((0, 2, 1, 3))
-                    init_vels = init_vels[:, 0]
-                    value_losses = 0
-                    for i in range(pred_trajs.size(2)):
-                        pred_value, value_loss = valuenet.calc_embodied_motion_loss(
-                            pred_trajs[:, :, i], None, init_vels
-                        )
-                        value_losses += value_loss
-                    # if torch.any(torch.isnan(value_losses)):
-                    # import pdb; pdb.set_trace()
-                    value_losses *= args.valueloss_w
-                    value_loss = value_losses / pred_trajs.size(2)
-                    loss = (
-                        loss + value_loss.mean()
-                        if not torch.isnan(value_loss.mean())
-                        else loss
+
+            # The EmLoco loss always scores the primary pedestrian, whether or not the
+            # reconstruction loss above supervises every agent.
+            if valuenet is not None:
+                pred_trajs = pred_trajs[:, 0].permute((0, 2, 1, 3))
+                init_vels = init_vels[:, 0]
+                value_losses = 0
+                for i in range(pred_trajs.size(2)):
+                    pred_value, value_loss = valuenet.calc_embodied_motion_loss(
+                        pred_trajs[:, :, i], None, init_vels
                     )
+                    value_losses += value_loss
+                value_losses *= args.valueloss_w
+                value_loss = value_losses / pred_trajs.size(2)
+                loss = (
+                    loss + value_loss.mean()
+                    if not torch.isnan(value_loss.mean())
+                    else loss
+                )
 
             if backprop:
-                # print(loss)
                 loss.backward()
                 optimizer.step()
             res["loss"] += loss.item() * batch_size
@@ -568,7 +550,6 @@ def test(model, optimizer, epoch, loader, backprop=True, valuenet=None):
     pred_dict = {"first": [], "pred": [], "values": []}
     with torch.no_grad():
         for batch_idx, data in enumerate(loader):
-            # import pdb; pdb.set_trace()
             if data is not None:
                 loc, loc_end, num_valid = data
 
@@ -644,8 +625,6 @@ def test(model, optimizer, epoch, loader, backprop=True, valuenet=None):
                         candidates[:, i, 1] = torch.Tensor(fdes[:, 0, i]).cuda()
                         pred_values[:, i] = pred_value[:, 0]
 
-                    # import pdb; pdb.set_trace()
-                    # import pdb; pdb.set_trace()
                     id_maxvalue = torch.argmax(pred_values, dim=1)
                     filter_threshold = 0.85
                     for i, scene in enumerate(candidates):
@@ -666,8 +645,6 @@ def test(model, optimizer, epoch, loader, backprop=True, valuenet=None):
                             sample_num_filtered += 1
                     print("filtered_ade:", res["filtered_ade"])
                     print("out_ade:", res["out_ade"])
-                    # 小数点以下２桁までで保存
-                    # import pdb; pdb.set_trace()
                     first_coord = np.round(loc[0, 0, -1].cpu().numpy() * 1.6, 2)
                     pred_dict["first"].append(first_coord)
                     pred_dict["pred"].append(loc_pred[0, 0] * 1.6)

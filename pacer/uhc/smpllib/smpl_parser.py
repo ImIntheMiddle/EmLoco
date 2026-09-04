@@ -507,8 +507,6 @@ class SMPLH_Parser(_SMPLH):
         }
         self.joint_range["L_Elbow"] *= 4
         self.joint_range["R_Elbow"] *= 4
-        # import ipdb
-        # ipdb.set_trace()
 
         self.contype = {1: self.joint_names}
         self.conaffinity = {1: self.joint_names}
@@ -627,8 +625,6 @@ class SMPLX_Parser(_SMPLX):
         }
         self.joint_range["L_Elbow"] *= 4
         self.joint_range["R_Elbow"] *= 4
-        # import ipdb
-        # ipdb.set_trace()
 
         self.contype = {1: self.joint_names}
         self.conaffinity = {1: self.joint_names}
@@ -708,12 +704,6 @@ class SMPLX_Parser(_SMPLX):
 
             smpl_joint_parents = self.parents.cpu().numpy()
             joint_pos = Jtr[0].numpy()
-            # print(
-            #     joint_pos.shape,
-            #     smpl_joint_parents.shape,
-            #     len(self.parents_to_use),
-            #     self.parents.cpu().numpy().shape,
-            # )
             joint_offsets = {
                 joint_names[c]:
                 (joint_pos[c] - joint_pos[p]) if c > 0 else joint_pos[c]
@@ -745,5 +735,5 @@ class SMPLX_Parser(_SMPLX):
 
 
 if __name__ == "__main__":
-    smpl_p = SMPLH_Parser("/hdd/zen/dev/copycat/Copycat/data/smpl",
+    smpl_p = SMPLH_Parser("data/smpl",
                           gender="neutral")

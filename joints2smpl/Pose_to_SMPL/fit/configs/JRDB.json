@@ -12,7 +12,7 @@
     },
     "USE_GPU": 1,
     "DATASET": {
-        "NAME": "UTD-MHAD",
+        "NAME": "JRDB",
         "PATH": "../../social-transmotion/data/jrdb_all_visual_cues/original_pose/test/",
         "TARGET_PATH": "",
         "DATA_MAP": [

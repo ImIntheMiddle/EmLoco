@@ -18,8 +18,7 @@
 - `pacer/` — pedestrian animation controller + LocoVal value-network training (Isaac Gym)
 - `joints2smpl/` — 3D keypoint → SMPL pose fitting
 - `EqMotion/` — alternative backbone (ETH/UCY benchmark)
-- `isaacgym/` — NVIDIA Isaac Gym source (binaries fetched separately)
-- `pyproject.toml` — unified Python 3.8 + CUDA 12.1 environment for all four subprojects
+- `isaacgym/` — NVIDIA Isaac Gym
 
 ## ⬇️Installation
 
@@ -29,13 +28,13 @@ Tested on Python 3.8.20 + CUDA 12.1. Requires [`uv`](https://docs.astral.sh/uv/)
 git clone https://github.com/ImIntheMiddle/EmLoco
 cd EmLoco
 uv sync
-source .venv-22.04/bin/activate    # required: PACER's gymtorch JIT needs `ninja` on PATH
+source .venv/bin/activate    # required: PACER's gymtorch JIT needs `ninja` on PATH
 ```
 
 ### Isaac Gym binaries (only needed for PACER training)
 
 ```bash
-# Get IsaacGym_Preview_4 from https://developer.nvidia.com/isaac-gym (login required)
+# Get IsaacGym_Preview_4 from https://developer.nvidia.com/isaac-gym
 tar -xf IsaacGym_Preview_4_Package.tar.gz
 cp -r IsaacGym_Preview_4_Package/isaacgym/python/isaacgym/_bindings \
       ./isaacgym/python/isaacgym/_bindings
@@ -43,10 +42,10 @@ cp -r IsaacGym_Preview_4_Package/isaacgym/python/isaacgym/_bindings \
 
 ### SMPL body models
 
-Register at [smpl.is.tue.mpg.de](https://smpl.is.tue.mpg.de/) (v1.1.0). Both `pacer/` and `joints2smpl/` load SMPL — easiest is one canonical copy plus symlinks:
+Register at [smpl.is.tue.mpg.de](https://smpl.is.tue.mpg.de/) (v1.1.0). Both `pacer/` and `joints2smpl/` load SMPL:
 
 ```bash
-# Place official SMPL files (renamed — see pacer/README.md for the mapping) at:
+# Place official SMPL files at:
 pacer/data/smpl/{SMPL_NEUTRAL,SMPL_MALE,SMPL_FEMALE}.pkl
 
 # Mirror into joints2smpl's loader path:
@@ -58,14 +57,12 @@ done
 
 ## 🌐Data & Checkpoints
 
-CVPR-2025 preprocessed shards and `Ours` checkpoints (num_modes=1) live on 🤗 **[iminthemiddle/EmLoco](https://huggingface.co/iminthemiddle/EmLoco)** (`CC BY-NC 4.0`, research-only):
+Preprocessed data and `Ours` checkpoints live on 🤗 **[iminthemiddle/EmLoco](https://huggingface.co/iminthemiddle/EmLoco)** (`CC BY-NC 4.0`, research-only):
 
 ```bash
 pip install -U "huggingface_hub[cli]"
 hf download iminthemiddle/EmLoco --local-dir .assets --repo-type model
 ```
-
-Wire the assets into the expected layout (run from repo root):
 
 ```bash
 # Preprocessed shards (~28 GB: JTA J=49 .pt + JRDB J=26 .pkl)
@@ -87,47 +84,46 @@ ln -s "$PWD/.assets/checkpoints/valuenets/valuenet_realpath_JTA+JRDB_nopose_valu
 ln -s "$PWD/.assets/action_dict.json" joints2smpl/Pose_to_SMPL/action_dict.json
 ```
 
-> Want to rebuild everything from raw datasets? See **[docs/DATA_PREPARATION.md](docs/DATA_PREPARATION.md)** for the full pipeline. Reproduction status of every pipeline step (verified / smoke / deferred) is tracked in **[docs/REPRO_STATUS.md](docs/REPRO_STATUS.md)**.
+> See **[docs/DATA_PREPARATION.md](docs/DATA_PREPARATION.md)** for the full data pipeline.
 
 ## 🚀Quick Start
 
 > [!Tip]
-> Each subproject's scripts run from inside that subproject's directory. The examples below include the appropriate `cd`.
+> Each subproject's scripts run from inside that subproject's directory.
 
 ### Evaluate the released Ours checkpoint
 
 ```bash
 cd social-transmotion
 
-# JTA — expected ADE ≈ 0.951 / FDE ≈ 1.921
+# JTA
 python evaluate_jta.py  --exp_name jta_ours  --modality traj+all
 
-# JRDB — expected ADE ≈ 0.369 / FDE ≈ 0.724
+# JRDB
 python evaluate_jrdb.py --exp_name jrdb_ours --modality traj+all
 ```
-
-Both Ours checkpoints have `num_modes=1` (deterministic); no `--multi_modal` needed. The multi-modal Table rows in the paper (num_modes>1 with the LocoVal filter) require training your own — pass `--multi_modal --valueloss_w 1.0` to `train_*.py`.
 
 ### Train your own model with EmLoco loss
 
 ```bash
 cd social-transmotion
-python train_jta.py  --exp_name jta_my_emloco  --valueloss_w 1.0
-python train_jrdb.py --exp_name jrdb_my_emloco --valueloss_w 1.0
+python train_jta.py  --exp_name jta_my_emloco  --valueloss_w 100
+python train_jrdb.py --exp_name jrdb_my_emloco --valueloss_w 150
 ```
-
-Override the LocoVal value-net via the `valuenet_checkpoint` key in `social-transmotion/configs/*.yaml`.
 
 ### Visualization
 
+`visualize_pred.py` overlays several experiments in one figure, so it reads the `paths` dict defined near the top of its `__main__` (fill that in first) and the cache written by `evaluate_*.py --vis`:
+
 ```bash
 cd social-transmotion
+python evaluate_jta.py --exp_name jta_ours --modality traj+all --vis
 python visualize_pred.py --save_name jta_ours_vis
 ```
 
 ### (Optional) Re-train the LocoVal value function in Isaac Gym
 
-Requires Isaac Gym binaries + SMPL (above). Two-stage training: pretrain a locomotion policy, then a value head on top.
+Requires Isaac Gym binaries + SMPL (above).
 
 ```bash
 # Pre-step 1: PACER sample data (AMASS shapes, standing-upright pose, occlusions) — populates
@@ -141,28 +137,23 @@ python load_jta_traj.py  --cfg configs/jta_all_visual_cues.yaml
 python load_jrdb_traj.py --cfg configs/jrdb_all_visual_cues.yaml
 cd ..
 
-# Step 1: pretrain locomotion policy (~150k iterations; ckpt saved every 200 steps)
+# Step 1: pretrain locomotion policy
 cd pacer
 python pacer/run.py --pipeline=gpu --random_heading --init_heading --adjust_root_vel \
     --num_envs 1600 --real_path JTA+JRDB \
     --experiment policy_pretrain --max_iterations 150000
 
-# Step 2: train value head on top of the pretrained policy (~25k iterations)
+# Step 2: train LocoVal function on top of the pretrained policy
 python pacer/run.py --pipeline=gpu --random_heading --num_envs 160 \
     --load_path output/exp/pacer/policy_pretrain_00150000.pth \
     --real_path JTA+JRDB --input_init_pose --input_init_vel \
     --experiment valuenet_train --max_iterations 25000
-# Final ckpt: pacer/output/exp/pacer/valuenet_realpath_JTA+JRDB_valuenet_00025000.pth
+# Final ckpt: pacer/output/exp/pacer/valuenet_train_valuenet_00025000.pth
 ```
 
 ## 📜License
 
-| Component | License |
-|---|---|
-| This repository (source code) | MIT |
-| HF assets (`iminthemiddle/EmLoco`) | **CC BY-NC 4.0** (research, non-commercial) |
-| Submodules | `social-transmotion` AGPL-3.0 · `pacer` CC BY-NC-SA-4.0 (NVIDIA) · `joints2smpl/Pose_to_SMPL` GPL-3.0 · `isaacgym` NVIDIA proprietary · `EqMotion` MIT |
-| Data | JTA / JRDB / SMPL retain their original research-only licenses |
+The code original to this work is released under the MIT License (see [`LICENSE`](LICENSE)).
 
 ## 🔍Citation
 
@@ -177,4 +168,4 @@ python pacer/run.py --pipeline=gpu --random_heading --num_envs 160 \
 
 ## 🤗Acknowledgements
 
-Built on [PACER](https://github.com/nv-tlabs/pacer), [IsaacGymEnvs](https://github.com/isaac-sim/IsaacGymEnvs), [Social-Transmotion](https://github.com/vita-epfl/social-transmotion), [EqMotion](https://github.com/MediaBrain-SJTU/EqMotion), [JTA-Dataset](https://github.com/fabbrimatteo/JTA-Dataset), [JRDB-Traj](https://github.com/vita-epfl/JRDB-Traj), [Pose to SMPL](https://github.com/Dou-Yiming/Pose_to_SMPL), and [human-scene-transformer](https://github.com/google-research/human-scene-transformer). Huge thanks!
+This work is built on [PACER](https://github.com/nv-tlabs/pacer), [IsaacGymEnvs](https://github.com/isaac-sim/IsaacGymEnvs), [Social-Transmotion](https://github.com/vita-epfl/social-transmotion), [EqMotion](https://github.com/MediaBrain-SJTU/EqMotion), [JTA-Dataset](https://github.com/fabbrimatteo/JTA-Dataset), [JRDB-Traj](https://github.com/vita-epfl/JRDB-Traj), [Pose to SMPL](https://github.com/Dou-Yiming/Pose_to_SMPL), and [human-scene-transformer](https://github.com/google-research/human-scene-transformer). Huge thanks!

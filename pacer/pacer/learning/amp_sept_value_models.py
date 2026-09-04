@@ -11,7 +11,6 @@ class ModelAMPContinuousSeptValue(ModelAMPContinuousSept):
     def build(self, config):
         net = self.network_builder.build('amp', **config)
         # for name, _ in net.named_parameters():
-            # print(name)
         return ModelAMPContinuousSeptValue.Network(net)
 
     class Network(ModelAMPContinuousSept.Network):

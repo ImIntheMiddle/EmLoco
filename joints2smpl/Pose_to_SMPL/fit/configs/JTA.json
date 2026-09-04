@@ -12,7 +12,7 @@
     },
     "USE_GPU": 1,
     "DATASET": {
-        "NAME": "UTD-MHAD",
+        "NAME": "JTA",
         "PATH": "../../social-transmotion/data/jta_all_visual_cues/original_pose/val/",
         "TARGET_PATH": "",
         "DATA_MAP": [

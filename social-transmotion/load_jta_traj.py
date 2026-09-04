@@ -4,7 +4,6 @@ sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "
 import argparse
 from datetime import datetime
 import numpy as np
-import os
 import random
 import time
 import torch
@@ -41,7 +40,6 @@ def get_primary_init_pose_jta(joints):
 
 def main(config, logger, experiment_name, dataset_name, f_init_pose):
 
-    # import pdb; pdb.set_trace()
     in_F, out_F = config['TRAIN']['input_track_size'], config['TRAIN']['output_track_size']
     dataset_train = ConcatDataset(get_datasets(config['DATA']['train_datasets'], config, logger))
     dataloader_train = dataloader_for_val(dataset_train, config, shuffle=False, pin_memory=True)
@@ -88,7 +86,6 @@ def save_trajs(config, logger, dataset_name, dataloader, in_F, split='train', f_
         nan_mask_traj = torch.isnan(traj).any()
 
         if not nan_mask_traj.any():
-            # import pdb; pdb.set_trace()
             # interpolate the trajectory
             scene_data = traj.squeeze().numpy()[:13]
             natural = CubicSpline(traj_phase, scene_data, axis=0, bc_type='natural')
@@ -141,7 +138,6 @@ if __name__ == "__main__":
     np.random.seed(cfg['SEED'])
 
     dataset = cfg["DATA"]["train_datasets"]
-    # import pdb; pdb.set_trace()
 
     logger = create_logger(cfg["OUTPUT"]["log_dir"])
     logger.info("Initializing with config:")

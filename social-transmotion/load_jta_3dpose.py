@@ -12,8 +12,8 @@ def load_jta_3dpose(opt):
     datalist = []
     dataset_name = "jta_all_visual_cues"
     preprocess_dir = f"data/{dataset_name}/preprocess/{opt.split}"
-    # Dispatch by extension: dataset_jta.initialize() now writes .pt, but legacy
-    # plausibl-era runs left .pkl shards behind. Prefer .pt when both exist for
+    # Dispatch by extension: dataset_jta.initialize() now writes .pt, but older runs
+    # may have left .pkl shards behind. Prefer .pt when both exist for
     # the same part to avoid double-loading.
     files_pt = {f for f in os.listdir(preprocess_dir) if f.endswith(".pt")}
     files_pkl = {
@@ -21,15 +21,18 @@ def load_jta_3dpose(opt):
         for f in os.listdir(preprocess_dir)
         if f.endswith(".pkl") and f[:-4] + ".pt" not in files_pt
     }
-    files = sorted(files_pt | files_pkl)
+    files = sorted(files_pt | files_pkl, key=lambda f: int(f.rsplit("part_", 1)[1].split(".")[0]))
     load_bar = tqdm.tqdm(files)
-    for part, file in enumerate(load_bar):
+    for file in load_bar:
         path = f"{preprocess_dir}/{file}"
+        # Carry the shard's own part number: downstream pairs
+        # <prefix>pose_<split>_part<N> back with preprocess/<split>/part_<N>.
+        part = int(file.rsplit("part_", 1)[1].split(".")[0])
         if file.endswith(".pt"):
-            datalist.append(torch.load(path, weights_only=False))
+            datalist.append((part, torch.load(path, weights_only=False)))
         else:
             with open(path, "rb") as f:
-                datalist.append(pickle.load(f))
+                datalist.append((part, pickle.load(f)))
         load_bar.set_description(f"Loaded {len(datalist)} tracks")
     return datalist
 
@@ -40,8 +43,7 @@ def main(opt):
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
 
-    # import pdb; pdb.set_trace()
-    for part, data in enumerate(datalist):
+    for part, data in datalist:
         poselist = []
         keylist = []
         part_loader = tqdm.tqdm(data)
@@ -53,7 +55,6 @@ def main(opt):
                 # pose_2d = scene[0][:, 25:47]
                 keylist.append(f"part{part}_scene{scene_id}_person{person_id}")
                 poselist.append(pose_3d.numpy())
-        # import pdb; pdb.set_trace()
         posearray = np.array(poselist)  # (n, 21, 22, 3)
         posedict = {"keylist": keylist, "posearray": posearray}
 

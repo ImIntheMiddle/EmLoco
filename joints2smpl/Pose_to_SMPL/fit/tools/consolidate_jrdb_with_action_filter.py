@@ -4,12 +4,12 @@ action-aware pose masking (CVPR 2025 EmLoco reproduction).
 Pipeline:
   fit/output/JRDB_cross_fixed/jrdbpose_<split>_part<N>/batch*_params.pkl
         (key format: "part<N>_scene<S>_person<I>_frame<F>", Jtr (N, 24, 3))
-  jrdb_2dbox/preprocess/{split}/part_<N>.pkl
+  jrdb_2dbox/preprocess/{split}/part_<N>.pt
         (list[scene] of list[person] of (joints[T,2,4], mask[T,2], (scene_name, ped_ids)))
   action_dict.json
         ({split: {base_scene: {frame_str: {ped_str: action}}}})
         ↓
-  jrdb_all_visual_cues/preprocess_smpl_cvpr/{split}/part_<N>.pkl
+  jrdb_all_visual_cues/preprocess_smpl_cvpr/{split}/part_<N>.pt
      list[scene] of list[person] of (joints[T, 26, 4], mask[T, 26], (scene_name, ped_ids))
        joints[:, 0:2, :] = traj + 2dbb (copied from jrdb_2dbox)
        joints[:, 2:26, :3] = SMPL Jtr 24 joints (AMP-reordered via SMPL_MAPPING)

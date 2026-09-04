@@ -87,7 +87,6 @@ class AMPPlayerContinuous(common_player.CommonPlayer):
             # flip_action[..., 0] *= -1
             # flip_action[..., 2] *= -1
             # flip_action[..., :] = flip_action[..., left_to_right_index, :]
-            # print("flip diff", (flip_action.view(-1, 69) - action).norm(dim = 1))
 
             disc_pred = self._eval_disc(amp_obs_single)
             amp_rewards = self._calc_amp_rewards(amp_obs_single)
@@ -96,7 +95,6 @@ class AMPPlayerContinuous(common_player.CommonPlayer):
             disc_pred = disc_pred.detach().cpu().numpy()[0, 0]
             disc_reward = disc_reward.cpu().numpy()[0, 0]
 
-            # print("disc_pred: ", disc_pred, disc_reward)
 
             # if not "rewards" in self.__dict__:
             #     self.rewards = []
@@ -104,8 +102,6 @@ class AMPPlayerContinuous(common_player.CommonPlayer):
             #     self._calc_amp_rewards(
             #         info['amp_obs'])['disc_rewards'].squeeze())
             # if len(self.rewards) > 500:
-            #     print(torch.topk(torch.stack(self.rewards).mean(dim = 0), k=150, largest=False)[1])
-            #     import ipdb; ipdb.set_trace()
             #     self.rewards = []
 
         # jp hack
@@ -139,7 +135,6 @@ class AMPPlayerContinuous(common_player.CommonPlayer):
             print(torch.stack(self.reward_acc).mean(dim = 0))
             self.grad_acc = []
             self.reward_acc = []
-            # import ipdb; ipdb.set_trace()
             print("Dumping Grad info!!!!")
 
         return

@@ -40,7 +40,7 @@ class Bone:
 
 class Skeleton:
     def __init__(
-        self, template_dir="/hdd/zen/dev/copycat/Copycat/assets/bigfoot_template.pkl"
+        self, template_dir="pacer/data/assets/bigfoot_template.pkl"
     ):
         self.bones = []
         self.name2bone = {}
@@ -105,15 +105,12 @@ class Skeleton:
             self.name2bone[joint] = bone
         for bone in self.bones[1:]:
             parent_name = parents[bone.name]
-            # print(parent_name)
             if parent_name in self.name2bone.keys():
                 bone_p = self.name2bone[parent_name]
                 bone_p.child.append(bone)
                 bone.parent = bone_p
 
         self.forward_bvh(self.root)
-        # import pdb
-        # pdb.set_trace()
         for bone in self.bones:
             if len(bone.child) == 0:
                 bone.end = bone.pos.copy()
@@ -127,7 +124,7 @@ class Skeleton:
     def write_xml(
         self,
         fname,
-        template_fname="/hdd/zen/dev/copycat/Copycat/assets/mujoco_models/template/humanoid_template.xml",
+        template_fname="pacer/data/assets/mjcf/humanoid_template.xml",
         offset=np.array([0, 0, 1]),
         ref_angles=None,
         bump_buffer=False,
@@ -155,7 +152,7 @@ class Skeleton:
 
     def write_str(
         self,
-        template_fname="/hdd/zen/dev/copycat/Copycat/assets/mujoco_models/template/humanoid_template.xml",
+        template_fname="pacer/data/assets/mjcf/humanoid_template.xml",
         offset=np.array([0, 0, 1]),
         ref_angles=None,
         bump_buffer=False,

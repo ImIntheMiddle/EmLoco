@@ -467,7 +467,6 @@ def get_expert(expert_qpos):
 
         # _map, _ = env.get_body_occup_map(occup_joints)
         # _map_torch = env_humanoid.get_body_occup_map(torch.tensor(qpos, dtype=dtype, device=device), occup_joints).squeeze()
-        # print(torch.sum(_map_torch))
         # assert np.array_equal(_map, _map_torch.cpu().numpy()), "Map creation error"
     t2 = time.time()
     print("======================================================")
@@ -516,10 +515,9 @@ if __name__ == "__main__":
         cfg_id="copycat_30",
         create_dirs=False,
     )
-    # cfg.mujoco_model_file = "/hdd/zen/dev/copycat/Copycat/assets/mujoco_models/humanoid_smpl_neutral_mesh_all.xml"
-    cfg.mujoco_model_file = "/hdd/zen/dev/copycat/Copycat/assets/mujoco_models/humanoid_smpl_neutral_masterfoot.xml"
-    smpl_model_file = "/hdd/zen/dev/copycat/Copycat/assets/mujoco_models/humanoid_smpl_neutral_mesh.xml"
-    master_foot_model_file = "/hdd/zen/dev/copycat/Copycat/assets/mujoco_models/humanoid_smpl_neutral_masterfoot.xml"
+    cfg.mujoco_model_file = "pacer/data/assets/mjcf/humanoid_smpl_neutral_masterfoot.xml"
+    smpl_model_file = "pacer/data/assets/mjcf/humanoid_smpl_neutral_mesh.xml"
+    master_foot_model_file = "pacer/data/assets/mjcf/humanoid_smpl_neutral_masterfoot.xml"
     data_loader = DatasetAMASSSingle(cfg.data_specs, data_mode="test")
     init_expert = data_loader.sample_seq()
     cfg.masterfoot = True
@@ -540,7 +538,7 @@ if __name__ == "__main__":
     converter = SMPLConverter(smpl_model, sim_model)
     # # occup_joints = ['LeftFoot', 'RightFoot', 'LeftHand', 'RightHand', 'Hips']
 
-    data_load = joblib.load("/hdd/zen/data/ActBound/AMASS/relive_mocap_qpos_grad.pkl")
+    data_load = joblib.load("data/amass/relive_mocap_qpos_grad.pkl")
     for k in data_load.keys():
         expert_qpos = data_load[k]["qpos"]
         get_expert(converter.qpos_smpl_2_new(expert_qpos))

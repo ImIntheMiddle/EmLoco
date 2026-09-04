@@ -93,9 +93,7 @@ class TrajGenerator():
             if self._flags.slow:
                 speed[:] = speed/4
 
-            # import pdb; pdb.set_trace()
             if self._flags.adjust_root_vel:
-                # import pdb; pdb.set_trace()
                 root_speed = torch.norm(root_vel[:,:2], dim=-1)
                 init_speed = speed[:, 0]
                 speed_ratio = root_speed / init_speed # (envs) speed: (envs, 100)
@@ -115,14 +113,12 @@ class TrajGenerator():
             self._verts[env_ids, 0, 0:2] = init_pos[..., 0:2]
             self._verts[env_ids, 1:] = vert_pos
 
-            # import pdb; pdb.set_trace()
 
             ####### ZL: Loading random real-world trajectories #######
             if self._flags.real_path:
                 # hybrid_init_prob = 0.5
                 real_data_prob = torch.rand(n, device=self._device)
                 real_data_num = int(torch.sum(real_data_prob > self._hybrid_init_prob))
-                # print(f'generating with {real_data_num} real data')
                 real_data_mask = real_data_prob > self._hybrid_init_prob
 
                 jta_num = len(self.traj_data_jta) if self._flags.jta_path else 0
@@ -145,7 +141,6 @@ class TrajGenerator():
                     raise ValueError('Invalid traj_data length')
                 traj = traj.to(self._device).float()
 
-                # import pdb; pdb.set_trace()
                 # offset = traj[..., 0, 0:2] - init_pos[real_data_mask, 0:2]
                 traj[..., 0:2] = traj[..., 0:2] - traj[..., 0, 0:2].unsqueeze(1)
 
@@ -175,29 +170,27 @@ class TrajGenerator():
                 self._verts[env_ids] = traj
 
             if self._flags.init_heading:
-                # import pdb; pdb.set_trace()
                 # calculate the heading of the first segment
                 copied_verts = self._verts[env_ids].clone()
                 dinit = (copied_verts[:, 1, :2].clone() - copied_verts[:, 0, :2].clone()) # initial velocity
 
-                # root_vel と dinit の両方がゼロベクトルでないかチェック
+                # Guard against zero-length root_vel / dinit before taking atan2.
                 root_vel_mag = torch.sqrt(torch.sum(root_vel**2, dim=1))
                 dinit_mag = torch.sqrt(torch.sum(dinit**2, dim=1))
 
-                # ゼロベクトルである場合の処理（例：0 に置き換える）
+                # A zero-length vector has no heading; fall back to 0.
                 root_rot = torch.where(root_vel_mag > 0, torch.atan2(root_vel[..., 1], root_vel[..., 0]), torch.zeros_like(root_vel[..., 0]))
                 init_heading = torch.where(dinit_mag > 0, torch.atan2(dinit[..., 1], dinit[..., 0]), torch.zeros_like(dinit[..., 0]))
 
                 # init_heading = torch.atan2(dinit[..., 1], dinit[..., 0])
                 # calculate the difference between the root rotation and the initial heading
                 # root_rot = torch.atan2(root_vel[..., 1], root_vel[..., 0])
-                rot_diff = init_heading - root_rot # この角度だけ回転．通常の処理
-                if self._flags.heading_inversion: # 半数のデータを反転させる
+                rot_diff = init_heading - root_rot
+                if self._flags.heading_inversion:  # flip the heading on half of the samples
                     inversion_flag = torch.rand(n, device=self._device) > 0.5
                     self.inverted[env_ids[inversion_flag]] = True
                     self.inverted[env_ids[~inversion_flag]] = False
-                    # init_headingの反対方向に回転する
-                    rot_diff[inversion_flag] = init_heading[inversion_flag] - root_rot[inversion_flag] + np.pi # rootに対し反対方向に回転
+                    rot_diff[inversion_flag] = init_heading[inversion_flag] - root_rot[inversion_flag] + np.pi  # face opposite to the root heading
                 # translate the trajectory to the origin
                 origin = copied_verts[:, 0, 0:2].clone()
                 origin = origin.unsqueeze(1)
@@ -207,8 +200,6 @@ class TrajGenerator():
                 c, s = torch.cos(rot_diff), torch.sin(rot_diff)
                 R = torch.stack([c, -s, s, c], dim=-1).view(-1, 2, 2)
 
-                # おそらく，ここの行列処理がおかしい．
-                # 書き下して確認する．
                 copied_verts[:, :, 0:2] = torch.bmm(copied_verts[:, :, 0:2].clone(), R) # copied verts transformed
 
                 # assert alignment
@@ -219,7 +210,6 @@ class TrajGenerator():
                 # aligned_heading = torch.atan2(daligned[..., 1], daligned[..., 0])
                 fixed_rot_diff = root_rot - aligned_heading
                 masked_rot_diff = fixed_rot_diff[~torch.all(dinit==0, dim=1)]
-                # import pdb; pdb.set_trace()
                 if len(masked_rot_diff) > 0:
                     if self._flags.heading_inversion:
                         rot_assert_flag1 = (masked_rot_diff[~inversion_flag].abs().max() > 1e-4) if len(masked_rot_diff[~inversion_flag]) > 0 else False
@@ -245,7 +235,6 @@ class TrajGenerator():
         from scipy.interpolate import interp1d
         x = requests.get(
             f'http://{SERVER}:{PORT}/path?num_envs={len(env_ids)}')
-        import pdb; pdb.set_trace()
         data_lists = [value for idx, value in x.json().items()]
         coord = np.array(data_lists)
         x = np.linspace(0, coord.shape[1] - 1, num = coord.shape[1])
@@ -276,7 +265,6 @@ class TrajGenerator():
         return self._verts[traj_id]
 
     def calc_pos(self, traj_ids, times):
-        # import pdb; pdb.set_trace()
         traj_dur = self.get_traj_duration()
         num_verts = self.get_num_verts()
         num_segs = self.get_num_segs()
@@ -308,7 +296,6 @@ class TrajGenerator():
 
         pos0 = self._verts_flat[traj_ids * num_verts + seg_id0]
         pos1 = self._verts_flat[traj_ids * num_verts + seg_id1]
-        import pdb; pdb.set_trace()
 
         lerp = lerp.unsqueeze(-1)
         pos = (1.0 - lerp) * pos0 + lerp * pos1

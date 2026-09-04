@@ -34,7 +34,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 # from pacer.pacer.utils.flags import flags
 from pacer.utils.flags import flags
 from collections import defaultdict
-import aiohttp, cv2, asyncio
+import cv2, asyncio
 import json
 from collections import deque
 import shutil
@@ -68,18 +68,10 @@ class BaseTask():
         if self.device_type == "cuda" or self.device_type == "GPU":
             self.device = "cuda" + ":" + str(self.device_id)
 
-        # double check!
-        # import pdb; pdb.set_trace()
-        self.graphics_device_id = self.device_id + 2 # dl41
-        # self.graphics_device_id = self.device_id # dl32
+        self.graphics_device_id = getattr(flags, "graphics_device_id", self.device_id)
 
         if not flags.render:
             self.graphics_device_id = -1
-        # enable_camera_sensors = True
-        # if enable_camera_sensors == False and self.headless == True:
-            # self.graphics_device_id = self.device_id+2 if flags.render else -1
-        # if flags.server_mode:
-            # self.graphics_device_id = self.device_id
 
         self.num_envs = cfg["env"]["numEnvs"]
         self.num_obs = cfg["env"]["numObservations"]
@@ -123,7 +115,6 @@ class BaseTask():
         self.last_rand_step = -1
 
         # create envs, sim and viewer
-        # import pdb; pdb.set_trace()
         self.create_sim()
         self.gym.prepare_sim(self.sim)
         self.video_dir = str(osp.join('output', 'renderings', f"{cfg['name']}/"))
@@ -149,7 +140,6 @@ class BaseTask():
 
         # set the camera position based on up axis
         sim_params = self.gym.get_sim_params(self.sim)
-        # print("Up axis: ", sim_params.up_axis==gymapi.UP_AXIS_Z)
         if sim_params.up_axis == gymapi.UP_AXIS_Z:
             # cam_pos = gymapi.Vec3(20.0, 25.0, 3.0)
             cam_pos = gymapi.Vec3(40.0, 50, 9.0)
@@ -195,7 +185,6 @@ class BaseTask():
         self.viewing_env_idx = 0
         for idx, env in enumerate(self.envs):
             h = self.gym.create_camera_sensor(env, camera_props)
-            # print(h)
             if flags.render:
                 self.gym.set_camera_location(h, env, cam_pos, cam_target)
             self.recorder_camera_handles.append(h)
@@ -217,7 +206,6 @@ class BaseTask():
         # self.envs = RecordVideo(self.envs, self.video_dir)
 
         ##### Custom light source #####
-        # import pdb; pdb.set_trace()
         self.gym.set_light_parameters(self.sim, 0, gymapi.Vec3(0.7, 0.7, 0.7), gymapi.Vec3(0.7, 0.7, 0.7), gymapi.Vec3(0, 0, 1))
         self.gym.set_light_parameters(self.sim, 1, gymapi.Vec3(0, 0, 0), gymapi.Vec3(0, 0, 0), gymapi.Vec3(0, 0, 0))
 
@@ -291,8 +279,9 @@ class BaseTask():
         loop.run_until_complete(self.talk())
         loop.run_forever()
 
-    #print(URL)
     async def talk(self):
+        import aiohttp
+
         URL = f'http://{SERVER}:{PORT}/ws'
         print("Starting websocket client")
         session = aiohttp.ClientSession()
@@ -326,16 +315,15 @@ class BaseTask():
                                 self.viewing_env_idx = int(env_id)
                                 print("view env idx: ", self.viewing_env_idx)
                         except:
-                            import ipdb
-                            ipdb.set_trace()
                             print("error parsing server message")
                 elif msg.type == aiohttp.WSMsgType.CLOSED:
                     break
                 elif msg.type == aiohttp.WSMsgType.ERROR:
                     break
 
-    #print(URL)
     async def video_stream(self):
+        import aiohttp
+
         URL = f'http://{SERVER}:{PORT}/ws'
         print("Starting websocket client")
         session = aiohttp.ClientSession()
@@ -349,7 +337,6 @@ class BaseTask():
 
 
     def render(self, sync_frame_time=False):
-        # import pdb; pdb.set_trace()
         if self.viewer:
             # check for window closed
             if self.gym.query_viewer_has_closed(self.viewer):
@@ -444,7 +431,6 @@ class BaseTask():
                         writer.append_data(frame[:height, :width, :])
                     except:
                         print('image size changed???')
-                        import ipdb; ipdb.set_trace()
 
                 writer.close()
                 self._video_queue = deque(maxlen = self.max_video_queue_size)
@@ -458,9 +444,7 @@ class BaseTask():
                     print("============ Video finished copying to server ============")
                 self.recording_state_change = False
             # else:
-            #     print(f"============ Writing video ============")
 
-        # import pdb; pdb.set_trace()
 
         # if self.recording or flags.server_mode:
         if flags.render:
@@ -483,7 +467,6 @@ class BaseTask():
                 self.gym.step_graphics(self.sim)
 
             if flags.no_virtual_display:
-                # import pdb; pdb.set_trace()
                 self.gym.render_all_camera_sensors(self.sim)
                 color_image = self.gym.get_camera_image(self.sim, self.envs[self.viewing_env_idx], self.recorder_camera_handles[self.viewing_env_idx], gymapi.IMAGE_COLOR)
             # if len(color_image.shape) >= 3:
@@ -495,7 +478,6 @@ class BaseTask():
 
             if self.recording and self.color_image is not None:
                 # self._video_queue.append(self.color_image[..., :3])
-                # print(self.rew_buf)
                 self._video_queue.append(self.color_image)
                 self._record_states()
 
@@ -810,13 +792,11 @@ class BaseTask():
         os.makedirs(save_dir, exist_ok=True)
         video = self._video_queue
         writer = imageio.get_writer(curr_video_file_name, fps=30, macro_block_size=None)
-        # import pdb; pdb.set_trace()
         fig, ax, bg, = init_traj_plot(real_traj, ideal_traj)
         acc_rew = 0
         for f, frame in enumerate(video):
             if f % 2 == 0: # downsample
                 # save color image for visualization
-                # print(f"Saving frame {f}")
                 if not osp.exists(f"output/vis_sim/{exp_name}_{curr_game}"):
                     os.makedirs(f"output/vis_sim/{exp_name}_{curr_game}")
                 cv2.imwrite(f"output/vis_sim/{exp_name}_{curr_game}/{f}.png", cv2.cvtColor(frame, cv2.COLOR_RGB2BGR))
@@ -872,7 +852,6 @@ def init_traj_plot(real_traj, ideal_traj):
     # plot the red star on the last point of agent (real traj), lines3
     ax.plot(ideal_traj[-1, 0], ideal_traj[-1, 1], c = 'orange', marker='*', markersize=15)
 
-    # 描画と背景の保存
     fig.canvas.draw()
     bg = fig.canvas.copy_from_bbox(ax.bbox)
 
@@ -881,7 +860,6 @@ def init_traj_plot(real_traj, ideal_traj):
     return fig, ax, bg
 
 def update_traj_plot(fig, ax, bg, real_traj, frame, f, norm_rew):
-    # import pdb; pdb.set_trace()
     # marker on the last point, and line connecting all past points
     lines = ax.get_lines()
 
@@ -909,21 +887,16 @@ def update_traj_plot(fig, ax, bg, real_traj, frame, f, norm_rew):
     return frame, fig, ax, bg
 
 def combine_colormap(frame):
-    # import pdb; pdb.set_trace()
-    # カラーバーの高さは画像と同じ、幅は適宜選択
     height, width = frame.shape[:2]
     bar_width = width // 10
-    color_bar = np.linspace(1, 0, height).reshape(height, 1)  # 0～255のグラデーション
-    color_bar = np.repeat(color_bar, bar_width, axis=1)  # カラーバーの幅を持たせる.
+    color_bar = np.linspace(1, 0, height).reshape(height, 1)
+    color_bar = np.repeat(color_bar, bar_width, axis=1)
 
-    # matplotlibのviridisカラーマップを適用
-    color_bar_rgb = plt.get_cmap('viridis')(color_bar)[:, :, :3]  # RGBの最初の3チャンネルを抽出 (RGBA の A を無視)
-    color_bar_rgb = (color_bar_rgb * 255).astype(np.uint8)  # 0～1の値を0～255に変換
+    color_bar_rgb = plt.get_cmap('viridis')(color_bar)[:, :, :3]
+    color_bar_rgb = (color_bar_rgb * 255).astype(np.uint8)
 
-    # OpenCVの画像形式にするためにRGBをBGRに変換
     color_bar_bgr = cv2.cvtColor(color_bar_rgb, cv2.COLOR_RGB2BGR)
 
-    # 画像とカラーバーを横に並べて結合
     combined_image = cv2.hconcat([frame[..., :3], color_bar_rgb])
 
     return combined_image

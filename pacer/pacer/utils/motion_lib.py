@@ -44,7 +44,6 @@ class DeviceCache:
             try:
                 out = getattr(obj, k)
             except:
-                # print("Error for key=", k)
                 continue
 
             if isinstance(out, torch.Tensor):
@@ -63,7 +62,6 @@ class DeviceCache:
                 setattr(self, k, out)
                 num_added += 1
 
-        # print("Total added", num_added)
 
     def __getattr__(self, string):
         out = getattr(self.obj, string)
@@ -198,8 +196,6 @@ class MotionLib():
         rb_rot1 = self.grs[f1l]
         rb_rot = torch_utils.slerp(rb_rot0, rb_rot1, blend_exp)
 
-        # import ipdb
-        # ipdb.set_trace()
         # self.torch_humanoid.fk_batch()
         return root_pos, root_rot, dof_pos, root_vel, root_ang_vel, dof_vel, key_pos, self._motion_bodies[
             motion_ids], self._motion_aa[f0l], rg_pos, rb_rot
@@ -301,8 +297,6 @@ class MotionLib():
                 elif gender == "female":
                     gender = [2]
                 else:
-                    import ipdb
-                    ipdb.set_trace()
                     raise Exception("Gender Not Supported!!")
                 self._motion_aa.append(pose_aa.reshape(-1, 72))
                 self._motion_bodies.append(np.concatenate((gender, beta)))

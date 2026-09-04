@@ -29,7 +29,6 @@ class AMPPlayerContinuousValue(amp_players.AMPPlayerContinuous):
         self.inversion_penalty_scale = self.config["inversion_penalty_scale"]
         self.visualized_pose = False
         self.gamma = self.config['gamma']
-        # import pdb; pdb.set_trace()
 
         self.valuenet = self._build_valuenet(self.config)
         return
@@ -57,7 +56,6 @@ class AMPPlayerContinuousValue(amp_players.AMPPlayerContinuous):
         max_frame_rew = -100
         min_frame_rew = 100
 
-        # import pdb; pdb.set_trace()
 
         op_agent = getattr(self.env, "create_agent", None)
         if op_agent:
@@ -122,7 +120,6 @@ class AMPPlayerContinuousValue(amp_players.AMPPlayerContinuous):
                         action = self.get_action(obs_dict, is_determenistic)
                     obs_dict, r, done, info =  self.env_step(self.env, action)
 
-                    # import pdb; pdb.set_trace()
                     real_traj.append(copy.deepcopy(self.env.task._humanoid_root_states[0,:2].cpu().numpy()))
                     r *= (-self.inversion_penalty_scale) if inverted_envs else 1.0
                     if n == 0:
@@ -130,15 +127,12 @@ class AMPPlayerContinuousValue(amp_players.AMPPlayerContinuous):
                             waypoint_traj = self.env.get_waypoint_traj()[:,:13,:].to(self.device)
                             init_pose = self.env.get_init_pose().to(self.device)
                             init_vel = self.env.get_init_vel().to(self.device)
-                            # import pdb; pdb.set_trace()
                             valuenet_pred = self.valuenet(waypoint_traj, init_pose, init_vel)
                             if not self.visualized_pose:
                                 self.valuenet.visualize_pose(init_pose.cpu(), gt_xy=waypoint_traj.cpu())
                                 # self.visualized=True
                     r_raw = self.env.raw_reward()
                     r_loc, r_pow = r_raw[:,0], r_raw[:,1]
-                    # print(f'r_loc: {r_loc.mean():.2f}, r_pow: {r_pow.mean():.2f}')
-                    # import pdb; pdb.set_trace()
 
                     post_infos = self._post_step(info)
                     rew_disc_coef *= self.gamma # discount coefficient
@@ -168,7 +162,6 @@ class AMPPlayerContinuousValue(amp_players.AMPPlayerContinuous):
 
                     # dt = time.time() - t_s
                     # dt_acc.append(dt)
-                    # print(1/np.mean(dt_acc))
 
                     all_done_indices = done.nonzero(as_tuple=False)
                     done_indices = all_done_indices[::self.num_agents]
@@ -178,7 +171,6 @@ class AMPPlayerContinuousValue(amp_players.AMPPlayerContinuous):
                             # ratio = self.step_to_pred/self.env.task.max_episode_length
                             cr_to_pred = copy.deepcopy(cr)
                             if self.plot_val_reward:
-                                # import pdb; pdb.set_trace()
                                 rewards_loc.append(c_loc_reward.item())
                                 rewards_pow.append(c_pow_reward.item())
                                 rewards_disc.append(c_disc_reward)
@@ -187,11 +179,9 @@ class AMPPlayerContinuousValue(amp_players.AMPPlayerContinuous):
                         if n < self.step_to_pred:
                             cr_to_pred = copy.deepcopy(cr)
                             if self.plot_val_reward:
-                                # import pdb; pdb.set_trace()
                                 rewards_loc.append(c_loc_reward.item())
                                 rewards_pow.append(c_pow_reward.item())
                                 rewards_disc.append(c_disc_reward)
-                        # import pdb; pdb.set_trace()
                         norm_rewards = (cr_to_pred - min_reward) / (max_reward - min_reward)
                         value_loss = self.criterion(valuenet_pred.squeeze(), norm_rewards.squeeze())
                         print(f'pred_value: {valuenet_pred.mean().item():.2f}, cr_to_pred: {norm_rewards.mean().item():.2f}, value_loss: {value_loss.item():.2f}')
@@ -228,9 +218,7 @@ class AMPPlayerContinuousValue(amp_players.AMPPlayerContinuous):
                         #         game_res = info.get('scores', 0.5)
                         # if self.print_stats:
                         #     if print_game_res:
-                        #         print(f'reward: {cur_rewards/done_count:.2f}, steps: {cur_steps/done_count}, w: {game_res}')
                         #     else:
-                        #         print(f'reward: {cur_rewards/done_count:.2f}, steps: {cur_steps/done_count}')
 
                         # sum_game_res += game_res
 
@@ -254,7 +242,6 @@ class AMPPlayerContinuousValue(amp_players.AMPPlayerContinuous):
             print(f'av reward: {(sum_rewards / games_played * n_game_life):.3f}, av steps: {(sum_steps / games_played * n_game_life):.3f}, winrate: {(sum_game_res / games_played * n_game_life):.3f}')
         else:
             print(f'av reward: {(sum_rewards / games_played * n_game_life):.3f}, av steps: {(sum_steps / games_played * n_game_life):.3f}, av value loss: {total_value_loss / games_played:.3f}')
-            # print(f'av_loc: {rewards_loc.mean():.2f}, av_pow: {rewards_pow.mean():.2f}, av_disc: {rewards_disc.mean():.2f}, av_total: {rewards.mean():.2f}')
             print(f'av_loc: {mean(rewards_loc):.2f}, av_pow: {mean(rewards_pow):.2f}, av_disc: {mean(rewards_disc):.2f}, av_total: {mean(rewards):.2f}')
             # standard deviation
             print(f'std_loc: {np.std(rewards_loc):.2f}, std_pow: {np.std(rewards_pow):.2f}, std_disc: {np.std(rewards_disc):.2f}, std_total: {np.std(rewards):.2f}')
@@ -276,7 +263,6 @@ class AMPPlayerContinuousValue(amp_players.AMPPlayerContinuous):
 
     def _post_step(self, info):
         super()._post_step(info)
-        # import pdb; pdb.set_trace()
         if self.plot_val_reward:
             # self._amp_debug(info)
             return self._task_value_debug(info)
@@ -286,7 +272,6 @@ class AMPPlayerContinuousValue(amp_players.AMPPlayerContinuous):
     def _task_value_debug(self, info):
         obs = info['obs']
         amp_obs = info['amp_obs']
-        # import pdb; pdb.set_trace()
         obs = obs.cuda()
         task_value = self._eval_task_value(obs)
         amp_obs_single = amp_obs[0:1].cuda()
@@ -363,7 +348,6 @@ class AMPPlayerContinuousValue(amp_players.AMPPlayerContinuous):
         return
 
     def _build_valuenet(self, config): # added by takez
-        # import pdb; pdb.set_trace()
         self.valuenet = ValuePoseNet(use_pose=self.use_pose, hide_toe=True, normalize=True, use_vel=self.use_vel, vru=self.use_vru)
         self.valuenet.load_state_dict(torch.load(self.player_config['valuenet_path']))
         self.valuenet.to(self.device)

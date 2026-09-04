@@ -27,6 +27,6 @@ MODEL:
     type: "transmotion"
     eval_single: false
     output_scale: 1
-    checkpoint: "social-transmotion/experiments/jta_smpl/checkpoints/best_val_checkpoint.pth.tar" ##checkpoint.pth.tar best_val_checkpoint.pth.tar
+    checkpoint: ""
     valuenet_checkpoint: "../pacer/output/exp/pacer/v4_valuenet_lr1e-4mini_valuenet.pth"
 

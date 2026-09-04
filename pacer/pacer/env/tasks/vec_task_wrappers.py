@@ -49,13 +49,11 @@ class VecTaskPythonWrapper(VecTaskPython):
 
     def get_waypoint_traj(self):
         waypoint_traj = self.task.waypoint_traj.clone()
-        # import pdb; pdb.set_trace()
         # normalize by origin
         waypoint_traj -= waypoint_traj[:,0].clone().unsqueeze(1)
         return waypoint_traj
 
     def get_init_pose(self):
-        # import pdb; pdb.set_trace()
         init_pose = self.task.init_pose.clone()
         # normalize by origin
         init_pose -= init_pose[:,0].clone().unsqueeze(1)

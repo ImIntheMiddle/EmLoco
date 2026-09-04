@@ -20,8 +20,8 @@ def load_jrdb_data(opt):
     datalist = []
     dataset_name = "jrdb_2dbox"
     preprocess_dir = f"data/{dataset_name}/preprocess/{opt.split}"
-    # Dispatch by extension: dataset_jrdb.initialize() now writes .pt, but legacy
-    # plausibl-era runs left .pkl shards behind. Prefer .pt when both exist for
+    # Dispatch by extension: dataset_jrdb.initialize() now writes .pt, but older runs
+    # may have left .pkl shards behind. Prefer .pt when both exist for
     # the same part.
     files_pt = {f for f in os.listdir(preprocess_dir) if f.endswith(".pt")}
     files_pkl = {
@@ -29,15 +29,18 @@ def load_jrdb_data(opt):
         for f in os.listdir(preprocess_dir)
         if f.endswith(".pkl") and f[:-4] + ".pt" not in files_pt
     }
-    files = sorted(files_pt | files_pkl)
+    files = sorted(files_pt | files_pkl, key=lambda f: int(f.rsplit("part_", 1)[1].split(".")[0]))
     load_bar = tqdm.tqdm(files)
-    for part, file in enumerate(load_bar):
+    for file in load_bar:
         path = f"{preprocess_dir}/{file}"
+        # Carry the shard's own part number: downstream pairs
+        # <prefix>pose_<split>_part<N> back with preprocess/<split>/part_<N>.
+        part = int(file.rsplit("part_", 1)[1].split(".")[0])
         if file.endswith(".pt"):
-            datalist.append(torch.load(path, weights_only=False))
+            datalist.append((part, torch.load(path, weights_only=False)))
         else:
             with open(path, "rb") as f:
-                datalist.append(pickle.load(f))
+                datalist.append((part, pickle.load(f)))
         load_bar.set_description(f"Loaded {len(datalist)} parts")
     return datalist
 
@@ -135,8 +138,7 @@ def main(opt):
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
 
-    # import pdb; pdb.set_trace()
-    for part, data in enumerate(datalist):
+    for part, data in datalist:
         poselist = []
         keylist = []
         plot_count = 0
@@ -161,7 +163,6 @@ def main(opt):
                                     pedestrian["label_id"]
                                     == f"pedestrian:{int(frame[1])}"
                                 ):
-                                    # import pdb; pdb.set_trace()
                                     pose = pedestrian["keypoints"]
                                     if plot_count <= 10:
                                         # plot the first pose with joint number
@@ -178,7 +179,6 @@ def main(opt):
 
                 keylist.append(f"part{part}_scene{scene_id}_person{person_id}")
                 poselist.append(np.array(pose_3d))
-        # import pdb; pdb.set_trace()
         posearray = np.array(poselist)  # (n, 21, 22, 3)
         tosavedict = {"keylist": keylist, "posearray": posearray}
 

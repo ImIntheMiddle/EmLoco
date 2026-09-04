@@ -56,7 +56,6 @@ class CommonAgent(a2c_continuous.A2CAgent):
         self.init_rnn_from_model(self.model)
         self.last_lr = float(self.last_lr)
 
-        # import pdb; pdb.set_trace()
         use_except = ["_task_value_mlp", "_value_logits"]
         if self._do_finetune:  # for finetuning of value network
             for name, param in self.model.named_parameters():
@@ -67,7 +66,6 @@ class CommonAgent(a2c_continuous.A2CAgent):
             for name, param in self.model.named_parameters():
                 if any(ex in name for ex in use_except):
                     param.requires_grad = False
-        # print('params', use_params)
         self.last_lr = 0 if self._do_finetune else float(self.last_lr)
         self.policy_lr = float(self.last_lr)
         self.value_lr = float(self.last_lr) if self._do_finetune else 0
@@ -417,7 +415,6 @@ class CommonAgent(a2c_continuous.A2CAgent):
         for n in range(self.horizon_length):
             self.obs = self.env_reset(done_indices)
 
-            pdb.set_trace()
 
             self.experience_buffer.update_data("obses", n, self.obs["obs"])
 
@@ -811,7 +808,6 @@ class CommonAgent(a2c_continuous.A2CAgent):
         pass
 
     def _build_valuenet(self):  # added by takez
-        # import pdb; pdb.set_trace()
         config = self.cfg
         self.valuenet = ValuePoseNet(
             use_pose=self.use_pose, use_vel=self.use_vel, vru=self.use_vru

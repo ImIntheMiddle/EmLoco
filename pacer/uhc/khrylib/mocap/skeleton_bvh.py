@@ -249,15 +249,12 @@ class Skeleton:
             self.name2bone[joint] = bone
         for bone in self.bones[1:]:
             parent_name = parents[bone.name]
-            # print(parent_name)
             if parent_name in self.name2bone.keys():
                 bone_p = self.name2bone[parent_name]
                 bone_p.child.append(bone)
                 bone.parent = bone_p
 
         self.forward_bvh(self.root)
-        # import pdb
-        # pdb.set_trace()
         for bone in self.bones:
             if len(bone.child) == 0:
                 bone.end = bone.pos.copy()

@@ -159,7 +159,6 @@ class HumanoidAMP(Humanoid):
         # root_pos, root_rot, dof_pos, root_vel, root_ang_vel, dof_vel, key_pos = self._motion_lib.get_motion_state(
         #     torch.tensor([0]).to(self.device),
         #     torch.tensor([1.5]).to(self.device))
-        # print(np.abs(dof_vel.cpu().numpy()).mean())
         return
 
     def get_num_amp_obs(self):
@@ -604,10 +603,7 @@ class HumanoidAMP(Humanoid):
         # if (key_body_pos[..., 2].mean(dim = -1) > 2).sum():
         #     self.humanoid_betas[torch.where((key_body_pos[..
         # ., 2].mean(dim = -1) > 2))].cpu().numpy()
-        #     import ipdb; ipdb.set_trace()
-        #     print('bugg')
         # if flags.debug:
-        # print(torch.topk(self._dof_pos.abs().sum(dim=-1), 5))
 
         if (env_ids is None):
             if self.smpl_humanoid:
@@ -717,8 +713,6 @@ class HumanoidAMP(Humanoid):
         # obs = self._compute_humanoid_obs(env_ids)
         # flip_obs = self._compute_flip_humanoid_obs(env_ids)
         # diff = obs[0] - flip_obs[1]
-        # import ipdb
-        # ipdb.set_trace()
         return
 
     def _update_camera(self):

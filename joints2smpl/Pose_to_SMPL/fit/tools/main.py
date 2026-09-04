@@ -179,7 +179,7 @@ if __name__ == "__main__":
             for batch_idx, (idxs, key_list, target) in enumerate(bar):
                 nans = torch.isnan(target).any(dim=1).any(dim=1)
                 nan_idxs = torch.where(nans)
-                assert target[nan_idxs].all() == True, "irregular nan detected"
+                assert torch.isnan(target[nan_idxs]).all(), "irregular nan detected"
                 real_idxs = torch.where(~nans)
                 input_target = target.clone()[real_idxs]
                 pose_params, shape_params, verts, Jtr = train(

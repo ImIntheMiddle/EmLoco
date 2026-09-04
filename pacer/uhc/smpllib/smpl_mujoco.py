@@ -323,7 +323,7 @@ class SMPLConverter:
 class SMPL_M_Renderer(object):
     def __init__(
             self,
-            model_file="/hdd/zen/dev/copycat/Copycat/assets/mujoco_models/humanoid_smpl_neutral_mesh.xml",
+            model_file="pacer/data/assets/mjcf/humanoid_smpl_neutral_mesh.xml",
             render_size=(960, 480),
     ):
         self.model = load_model_from_path(model_file)
@@ -410,8 +410,6 @@ class SMPL_M_Renderer(object):
         images = []
         print("Rendering: ", qpose.shape)
         for fr in range(qpose.shape[0]):
-            # import pdb
-            # pdb.set_trace()
             self.sim.data.qpos[:] = qpose[fr]
             self.sim.data.qpos[2] += offset_z
             self.sim.forward()
@@ -471,7 +469,7 @@ class SMPL_M_Renderer(object):
 class SMPL_M_Viewer(object):
     def __init__(
             self,
-            model_file="/hdd/zen/dev/copycat/Copycat/assets/mujoco_models/humanoid_smpl_neutral_mesh.xml",
+            model_file="pacer/data/assets/mjcf/humanoid_smpl_neutral_mesh.xml",
             render_size=(960, 480),
     ):
         self.model = load_model_from_path(model_file)
@@ -841,8 +839,6 @@ def qpos_to_smpl_torch(qpos, mj_model, smpl_model="smpl"):
         ind2 = body_qposaddr[bone_name]
         if ind1 == 0:
             quat = qpos[:, 3:7]
-            import ipdb
-            ipdb.set_trace()
             pose[:, ind1, :] = sRot.from_quat(quat[:,
                                                    [1, 2, 3, 0]]).as_rotvec()
         else:

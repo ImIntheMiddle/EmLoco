@@ -48,9 +48,7 @@ class HumanoidPedestrianTerrain(humanoid_traj.HumanoidTraj):
         self.device_id = cfg.get("device_id", 0)
         self.headless = cfg["headless"]
         # if flags.render:
-        #     print("Rendering On")
         # else:
-        #     print("Rendering Off")
 
         self.sensor_extent = cfg["env"].get("sensor_extent", 2)
         self.sensor_res = cfg["env"].get("sensor_res", 32)
@@ -153,7 +151,6 @@ class HumanoidPedestrianTerrain(humanoid_traj.HumanoidTraj):
 
     def _draw_task(self):
         # cols = np.array([[1.0, 0.0, 0.0]], dtype=np.float32)
-        # import pdb; pdb.set_trace()
         norm_states = self.get_head_pose()
         base_quat = norm_states[:, 3:7]
         if not self._has_upright_start:
@@ -170,10 +167,8 @@ class HumanoidPedestrianTerrain(humanoid_traj.HumanoidTraj):
         # self._sensor_pos[..., 2] -= 5
 
         traj_samples = self._fetch_traj_samples()
-        # print(traj_samples)
 
         self._marker_pos[:] = traj_samples
-        # print(self._marker_pos)
         self._marker_pos[..., 2] = self._humanoid_root_states[..., 2:3]  # jp hack # ZL hack
         # self._marker_pos[..., 2] = 0.89
         # self._marker_pos[..., 2] = 0
@@ -184,26 +179,21 @@ class HumanoidPedestrianTerrain(humanoid_traj.HumanoidTraj):
             comb_idx = torch.cat([self._marker_actor_ids])
 
         agent_color = np.zeros((self.num_envs, 3))
-        # import pdb; pdb.set_trace()
         for i in range(self.num_envs):
             cur_rew = self.rew_buf[i]
             # change the agent color based on the current reward (viridis)
 
-            # -3から3の範囲にクリップ
             cur_rew = np.clip(cur_rew, -1, 1)
             cur_rew = 1.7
 
-            # 正規化（自動でデータの最小値・最大値を使う）
             norm = mcolors.Normalize(vmin=-1, vmax=1)
 
             agent_color[i] = mcolors.to_rgb(plt.cm.viridis(norm(cur_rew)))
-            # 薄めのオレンジ
             # agent_color[i] = np.array([1, 0.5, 0.0])
             self.set_char_color(agent_color[i], [i])
 
         flags.show_traj = False
         if flags.show_traj:
-            # print("Drawing Traj")
             self.gym.set_actor_root_state_tensor_indexed(
                 self.sim, gymtorch.unwrap_tensor(self._root_states),
                 gymtorch.unwrap_tensor(comb_idx), len(comb_idx))
@@ -214,7 +204,6 @@ class HumanoidPedestrianTerrain(humanoid_traj.HumanoidTraj):
                 verts = self._traj_gen.get_traj_verts(i)
                 # verts[..., 2] = self._humanoid_root_states[i, 2]  # ZL Hack
                 verts[..., 2] = 0  # ZL Hack
-                # print(verts[90:])
                 # verts[..., 2] = 0.89
                 # verts[..., 2] = 0
                 lines = torch.cat([verts[:-1], verts[1:]], dim=-1).cpu().numpy()
@@ -234,7 +223,6 @@ class HumanoidPedestrianTerrain(humanoid_traj.HumanoidTraj):
 
             self.gym.clear_lines(self.viewer)
 
-        # print(self._marker_pos)
         return
 
     def _compute_humanoid_obs(self, env_ids=None):
@@ -251,7 +239,6 @@ class HumanoidPedestrianTerrain(humanoid_traj.HumanoidTraj):
                 body_vel = self._rigid_body_vel[env_ids]
                 body_ang_vel = self._rigid_body_ang_vel[env_ids]
             # if self.init_pose is None:
-                # import pdb; pdb.set_trace()
                 # self.init_pose[env_ids] = body_pos.clone()
             if self.smpl_humanoid:
                 if (env_ids is None):
@@ -399,7 +386,6 @@ class HumanoidPedestrianTerrain(humanoid_traj.HumanoidTraj):
             root_states = self._humanoid_root_states[env_ids]
         num_envs = self.num_envs if env_ids is None else len(env_ids)
 
-        # import pdb; pdb.set_trace()
         traj_samples = self._fetch_traj_samples(env_ids)
         # if self.waypoint_traj is None:
             # self.waypoint_traj = traj_samples
@@ -493,21 +479,17 @@ class HumanoidPedestrianTerrain(humanoid_traj.HumanoidTraj):
     def _reset_task(self, env_ids):
         # super()._reset_task(env_ids) # Commented out to disable traj resetting
         if not flags.server_mode:
-            # print(f'env_ids: {env_ids}')
-            # import pdb; pdb.set_trace()
             if len(env_ids) > 0:
                 # dealt with the case where env_ids is an empty list
                 # env_ids = env_ids.to(self.device) if type(env_ids) is not list else env_ids
                 root_pos = self._humanoid_root_states[env_ids, 0:3]
                 root_vel = self._humanoid_root_states[env_ids, 7:10]
                 root_rot = torch_utils.calc_heading(self._humanoid_root_states[env_ids, 3:7])
-                # import pdb; pdb.set_trace()
                 # if state_init is default, then just use None
                 motion_ids = self._reset_ref_motion_ids if hasattr(self, "_reset_ref_motion_ids") else None
                 motion_times = self._reset_ref_motion_times if hasattr(self, "_reset_ref_motion_times") else None
                 self._traj_gen.reset(env_ids, root_pos, root_vel, motion_ids, motion_times)
                 self.inverted = self._traj_gen.show_inverted()
-                # import pdb; pdb.set_trace()
                 if not self._traj_gen._flags.vru:
                     self.waypoint_traj[env_ids] = self._fetch_traj_samples(env_ids)
                 else:
@@ -568,7 +550,6 @@ class HumanoidPedestrianTerrain(humanoid_traj.HumanoidTraj):
             root_vel[:, 0] = torch.rand([num_envs]) * vel_range + vel_min
             root_vel = quat_apply(curr_heading, root_vel).clone()
 
-        # import pdb; pdb.set_trace()
 
         return motion_ids, motion_times, root_pos, root_rot, dof_pos, root_vel, root_ang_vel, dof_vel, key_pos, rb_pos, rb_rot
 
@@ -578,7 +559,6 @@ class HumanoidPedestrianTerrain(humanoid_traj.HumanoidTraj):
         ## Randomrized location setting
         new_root_xy = self.terrain.sample_valid_locations(self.num_envs, env_ids)
         # joblib.dump(self.terrain.sample_valid_locations(100000, torch.arange(100000)).detach().cpu(), "new_root_xy.pkl")
-        # import ipdb; ipdb.set_trace()
 
         if flags.fixed:
             # new_root_xy[:, 0], new_root_xy[:, 1] = 0 , 0
@@ -886,8 +866,6 @@ class HumanoidPedestrianTerrain(humanoid_traj.HumanoidTraj):
                                device=self.device,
                                dtype=torch.long)
         tar_pos = self._traj_gen.calc_pos(env_ids, time)
-        # print("tar_pos", tar_pos)
-        # import pdb; pdb.set_trace()
         ### ZL: entry point
         # self._traj_gen.update_sim_pos(self._humanoid_root_states[)
 
@@ -895,8 +873,6 @@ class HumanoidPedestrianTerrain(humanoid_traj.HumanoidTraj):
         center_height = self.get_center_heights(
             root_states, env_ids=None).mean(dim=-1, keepdim=True)
 
-        # import ipdb
-        # ipdb.set_trace()
         self.reset_buf[:], self._terminate_buf[:] = compute_humanoid_reset(
             self.reset_buf, self.progress_buf, self._contact_forces,
             self._contact_body_ids, center_height, self._rigid_body_pos,
@@ -915,7 +891,6 @@ class HumanoidPedestrianTerrain(humanoid_traj.HumanoidTraj):
         else:
             location_reward = compute_location_reward(root_pos, tar_pos)
         location_reward = self.location_coefficient * location_reward
-        # print("location_reward", location_reward)
 
         power = torch.abs(torch.multiply(self.dof_force_tensor, self._dof_vel)).sum(dim = -1)
         # power_reward = -0.00005 * (power ** 2)
@@ -1185,7 +1160,6 @@ class Terrain:
                 torch.logical_and(coord_y_scale < coord_y_scale.max() - self.border * self.horizontal_scale, coord_x_scale < coord_x_scale.max() - self.border * self.horizontal_scale),
                 torch.logical_and(coord_y_scale > coord_y_scale.min() + self.border * self.horizontal_scale, coord_x_scale > coord_x_scale.min() +  self.border * self.horizontal_scale)
             )
-        # import ipdb; ipdb.set_trace()
         # joblib.dump(self.walkable_field_raw, "walkable_field.pkl")
 
         self.coord_x_scale = coord_x_scale[walkable_subset]
@@ -1501,18 +1475,13 @@ def compute_humanoid_reset(reset_buf, progress_buf, contact_buf,
 
         has_failed = torch.logical_or(has_fallen, tar_fail)
         # if has_fallen.any():
-        #     import ipdb
-        #     ipdb.set_trace()
 
         if disableCollision:
             has_failed[:] = False
 
         ############################## Debug ##############################
         # if torch.sum(has_fallen) > 0:
-        #     import ipdb; ipdb.set_trace()
-        #     print("???")
         # mujoco_joint_names = np.array(['Pelvis', 'L_Hip', 'L_Knee', 'L_Ankle', 'L_Toe', 'R_Hip', 'R_Knee', 'R_Ankle', 'R_Toe', 'Torso', 'Spine', 'Chest', 'Neck', 'Head', 'L_Thorax', 'L_Shoulder', 'L_Elbow', 'L_Wrist', 'L_Hand', 'R_Thorax', 'R_Shoulder', 'R_Elbow', 'R_Wrist', 'R_Hand'])
-        # print( mujoco_joint_names[masked_contact_buf[0, :, 0].nonzero().cpu().numpy()])
         ############################## Debug ##############################
 
 
@@ -1523,7 +1492,6 @@ def compute_humanoid_reset(reset_buf, progress_buf, contact_buf,
 
         # if torch.sum(terminated) > 0:
         #     termianted_progress = progress_buf[torch.where(terminated)]
-        #     print(torch.where(termianted_progress < 30), termianted_progress[termianted_progress < 30])
 
     reset = torch.where(progress_buf >= max_episode_length - 1, torch.ones_like(reset_buf), terminated)
 

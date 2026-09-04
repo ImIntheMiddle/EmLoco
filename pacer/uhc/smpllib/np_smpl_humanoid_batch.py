@@ -467,5 +467,3 @@ if __name__ == "__main__":
     # diff = return_dict['wbpos'].reshape(-1, 24, 3) - fk_res['wbpos'].reshape(-1, 24, 3)
     diff = wbpos - fk_res['wbpos'].reshape(-1, 24, 3)
     print("diff", np.sum(np.abs(diff)))
-    import ipdb
-    ipdb.set_trace()

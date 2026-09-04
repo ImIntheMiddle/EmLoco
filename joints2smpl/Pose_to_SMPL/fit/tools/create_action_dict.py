@@ -29,7 +29,6 @@ def main(opt):
           action_dict[split][scene] = {}
           bar_frame = tqdm.tqdm(scene_data["labels"].keys(), leave=False)
           for frame in bar_frame:
-              # import pdb; pdb.set_trace()
               frame_id = int(frame.split(".jpg")[0])
               action_dict[split][scene][frame_id] = {}
               for pedestrian in scene_data["labels"][frame]:

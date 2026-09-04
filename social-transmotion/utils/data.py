@@ -16,7 +16,6 @@ def load_data_jrdb_2dbox(split):
     for scene_i, (filename, scene_id, paths) in enumerate(scene_loader):
         scene_train = Reader_jrdb_2dbox.paths_to_xy(paths)
         ids = Reader_jrdb_2dbox.paths_to_ids(paths)
-        # import pdb; pdb.set_trace()
         scene_train, ids = drop_ped_with_missing_frame(scene_train, ids=ids)
         scene_train, ids, _ = drop_distant_far(scene_train, ids=ids)
 

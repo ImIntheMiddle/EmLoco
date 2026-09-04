@@ -4,7 +4,6 @@ import os
 sys.path.append(
     os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "pacer", "pacer")
 )
-import os
 import json
 import argparse
 import torch
@@ -160,7 +159,6 @@ def evaluate_ade_fde(
 
     break_flag = False
     for i, batch in enumerate(bar):
-        # import pdb; pdb.set_trace()
         joints, masks, padding_mask, idxs_list = batch
         padding_mask = padding_mask.to(config["DEVICE"])
         primary_init_pose = joints[:, 0, 8, 2:, :3]
@@ -271,7 +269,6 @@ def evaluate_ade_fde(
                 metainfo = dataloader.dataset.show_meta_info(idxs_list[k])[0]
                 action_label = get_action_label(split, metainfo, action_dict)
 
-                # import pdb; pdb.set_trace()
                 sum_ade = 0
                 scene_des = []
                 for t in range(12):
@@ -320,7 +317,6 @@ def evaluate_ade_fde(
                         sum_ade_mean += sum_ade
                         scene_fde_mean += scene_fde
                         sample_num[action_label] += 1 / pred_xys.size(1)
-                        # import pdb; pdb.set_trace()
                         pred_value, value_loss = valuenet.calc_embodied_motion_loss(
                             pred_traj.unsqueeze(0),
                             init_pose.unsqueeze(0),
@@ -333,7 +329,6 @@ def evaluate_ade_fde(
                                 init_vel.unsqueeze(0),
                             )
                         )
-                        # import pdb; pdb.set_trace()
                         # frame_id, ped_id = int(frame_pedids[k][0][8][0]), int(frame_pedids[k][0][8][1])
                         # valuenet.visualize_pose(init_pose.unsqueeze(0).cpu(), past_xy.unsqueeze(0).cpu(), gt_traj.unsqueeze(0).cpu(), bbox_sizes[k].cpu(), bbox_order[k], frame_id, ped_id)
                         pred_value = pred_value.item()
@@ -352,7 +347,6 @@ def evaluate_ade_fde(
 
             filter_threshold = 0.8
             if num_mode > 1 and valuenet is not None:
-                # import pdb; pdb.set_trace()
                 if len(pred_values) > 0:
                     ade_list.extend([c[0] for c in candidates])
                     fde_list.extend([c[1] for c in candidates])
@@ -406,7 +400,6 @@ def evaluate_ade_fde(
                 and (not torch.isnan(init_pose).any())
                 and (not torch.isnan(pred_traj).any())
             ):
-                # import pdb; pdb.set_trace()
                 pred_xys = pred_xys.detach().cpu().numpy()
                 pred_xys = np.concatenate(
                     (np.zeros((1, pred_xys.shape[1], 2)), pred_xys), axis=0
@@ -450,7 +443,6 @@ def evaluate_ade_fde(
     total_des = np.zeros(12)
     total_sample_num = 0
     for action in action_list:
-        # import pdb; pdb.set_trace()
         ade[action] = (
             ade_batch[action] / sample_num[action] if sample_num[action] != 0 else 0
         )
@@ -534,7 +526,6 @@ def evaluate_ade_fde(
         logger.info(f"ADE of rejected samples: {ade_filtered:.5f}")
         logger.info(f"FDE of rejected samples: {fde_filtered:.5f}")
 
-        # import pdb; pdb.set_trace()
         value_array = np.array(value_list)  # 0 to 1
         ade_array = np.array(ade_list)
         fde_array = np.array(fde_list)
@@ -542,10 +533,8 @@ def evaluate_ade_fde(
         bins = np.arange(0, 1.05, 0.1)  # 0 to 1
         bin_centers = (bins[:-1] + bins[1:]) / 2  # 0.025 to 0.975
 
-        # valueの各ビンごとにade，fdeの平均値を計算
         value_indices = np.digitize(value_array, bins)
 
-        # valueの各ビンごとにade，fdeの平均値を計算
         ade_mean_values = [
             ade_array[value_indices == i].mean()
             if np.any(value_indices == i)
@@ -602,7 +591,6 @@ def evaluate_ade_fde(
         logger.info("vis_dict saved!")
 
     if args.valueloss:
-        # import pdb; pdb.set_trace()
         logger.info(f"Data with value:  {len(value_list)}/{len(dataloader.dataset)}")
         logger.info(f"Value:  {np.mean(value_list):.3f}")
         logger.info(f"Value GT: {np.mean(value_gt_list):.3f}")
@@ -622,13 +610,12 @@ def get_action_label(split, metainfo, action_dict):
     scene_name = metainfo[0].split("_shift")[0]
     ped_id = int(metainfo[1][0, 1])
     frames = metainfo[1][:, 0]
+    scene_actions = action_dict.get(split, {}).get(scene_name, {})
     action_list = []
     for frame in frames:
-        if str(int(frame)) in action_dict[split][scene_name].keys():
-            if str(ped_id) in action_dict[split][scene_name][str(int(frame))].keys():
-                action_list.append(
-                    action_dict[split][scene_name][str(int(frame))][str(ped_id)]
-                )
+        frame_actions = scene_actions.get(str(int(frame)), {})
+        if str(ped_id) in frame_actions:
+            action_list.append(frame_actions[str(ped_id)])
     # action of sequence: most frequent action
     action = max(set(action_list), key=action_list.count) if action_list else "None"
     return action
@@ -641,7 +628,7 @@ if __name__ == "__main__":
         "--split",
         type=str,
         default="test",
-        help="Split to use. one of [train, test, valid]",
+        help="Split to use. one of [train, val, test]",
     )
     parser.add_argument(
         "--metric",

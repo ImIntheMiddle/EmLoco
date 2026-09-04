@@ -2,7 +2,6 @@ import numpy as np
 import torch
 
 def MSE_LOSS(output, target, mask=None):
-    # import pdb; pdb.set_trace()
     pred_xy = output[:,:,0,:2]
     gt_xy = target[:,:,0,:2]
 
@@ -14,7 +13,6 @@ def MSE_LOSS(output, target, mask=None):
     return mean_B * 100
 
 def MSE_LOSS_MULTI(output, target, mask=None):
-    # import pdb; pdb.set_trace()
     pred_xys = output[:,:,:,:2]
     gt_xy = target[:,:,0,:2]
     gt_xys = gt_xy.unsqueeze(2).repeat(1,1,pred_xys.size(2),1)
@@ -50,17 +48,14 @@ def calculate_initial_yaw_error(group_A, group_B):
     Calculate angles between corresponding vectors in two groups using batch matrix multiplication,
     handling zero vectors and vectors with negative components.
     """
-    # ベクトルを正規化（ゼロベクトルを除く）
     norm_A = torch.norm(group_A, dim=1, keepdim=True)
     norm_B = torch.norm(group_B, dim=1, keepdim=True)
     normalized_A = torch.where(norm_A > 0, group_A / norm_A, group_A)
     normalized_B = torch.where(norm_B > 0, group_B / norm_B, group_B)
 
-    # 正規化されたベクトルの内積を計算
     dot_products = torch.bmm(normalized_A.view(len(norm_A), 1, 2), normalized_B.view(len(norm_B), 2, 1)).squeeze()
 
-    # ゼロベクトルを含む場合の処理
-    angles_radians = torch.acos(dot_products.clamp(-1, 1))  # 数値誤差を考慮してクランプ
+    angles_radians = torch.acos(dot_products.clamp(-1, 1))  # clamp: acos is undefined outside [-1, 1]
 
     return angles_radians
 

@@ -153,21 +153,4 @@ This repository is built on top of the following amazing repositories:
 
 Please follow the license of the above repositories for usage of that part of the codebase (the licenses are included in [this repo](./assets/licenses/)).
 
-# training at dl41
-CUDA_VISIBLE_DEVICES=0 python pacer/run.py --pipeline=gpu --random_heading --init_heading --adjust_root_vel --num_envs 1600 --real_path JTA+JRDB --experiment policy_test
-# --real_path JTA/JRDB/JTA+JRDB
-# --no_log
-
-# finetuning at dl41
-CUDA_VISIBLE_DEVICES=0 python pacer/run.py --pipeline=gpu --random_heading --num_envs 160 --load_path output/exp/pacer/policy_v4_realpath_JTA+JRDB_00005000.pth --real_path JTA+JRDB --input_init_pose --input_init_vel --experiment valuenet_test
-
-# testing
-CUDA_VISIBLE_DEVICES=1 python pacer/run.py --test --num_envs 1 --epoch -1 --pipeline=cpu --init_heading --random_heading --adjust_root_vel --input_init_pose --input_init_vel --experiment policy_v4_realpath
-
-CUDA_VISIBLE_DEVICES=0 python pacer/run.py --test --num_envs 1 --epoch -1 --pipeline=cpu --random_heading --input_init_pose --input_init_vel --experiment policy_v4_realpath_JTA+JRDB_00005000
-
-# visualize (render flag should be on)
-CUDA_VISIBLE_DEVICES=0 python pacer/run.py --test --num_envs 1 --epoch -1 --pipeline=cpu --graphics_device_id 2 --init_heading --random_heading --adjust_root_vel --experiment policy_v4_realpath_JTA+JRDB_00005000 --input_init_pose --input_init_vel
-# load_path output/exp/pacer/....pth
-
-# valuenet_1117_discount_hybrid_nopow
+Commands for training EmLoco's LocoVal value function are in the [top-level README](../README.md).

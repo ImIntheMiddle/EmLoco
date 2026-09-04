@@ -89,7 +89,6 @@ class NetworkBuilder:
                 return SRU(input, units, layers, dropout=0, layer_norm=False)
 
         def _build_sequential_mlp(self, input_size, units, activation, dense_func, norm_only_first_layer=False, norm_func_name=None):
-            # print('build mlp:', input_size)
             in_size = input_size
             layers = []
             need_norm = True

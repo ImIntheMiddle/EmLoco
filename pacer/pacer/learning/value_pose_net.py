@@ -66,12 +66,9 @@ class ValuePoseNet(nn.Module):
                 nn.init.constant_(m.bias, 0)
 
         # show the network
-        # print("ValuePoseNet: ", self._network)
-        # print("Parameters: ", sum(p.numel() for p in self._network.parameters()))
         return
 
     def _rotate_normalization(self, waypoint_traj, init_pose=None, init_vel=None):
-        # import pdb; pdb.set_trace()
         # self.visualize_pose(init_pose.clone().detach().cpu(), gt_xy=waypoint_traj.clone().detach().cpu(), label='before')
         x_vel = waypoint_traj[:, 1, 0]
         y_vel = waypoint_traj[:, 1, 1]
@@ -90,13 +87,11 @@ class ValuePoseNet(nn.Module):
         rotation_matrix = rotation_matrix.to(waypoint_traj.device)
         # rotate trajectory xy coordinates so that the first waypoint is at (0, 0)
         waypoint_traj_rotated = torch.bmm(waypoint_traj[...,:2], rotation_matrix)
-        # print(torch.atan2(waypoint_traj[:, 1, 1], waypoint_traj[:, 1, 0]))
         # assert torch.allclose(torch.atan2(waypoint_traj_rotated[:, 1, 1], waypoint_traj_rotated[:, 1, 0]), torch.zeros(len(waypoint_traj_rotated)).to(waypoint_traj_rotated.device), atol=1e-4), "First waypoint should be at (0, 0)"
         # rotate pose xy coordinates as well
         if init_pose is not None:
             init_pose[..., :2] = torch.bmm(init_pose[:,:,:2].clone(), rotation_matrix)
         if init_vel is not None:
-            # import pdb; pdb.set_trace()
             init_vel = torch.bmm(init_vel[:,:2].clone().unsqueeze(1), rotation_matrix)[:,0]
 
         # self.visualize_pose(init_pose.clone().detach().cpu(), gt_xy=waypoint_traj_rotated.clone().detach().cpu(), label='after')
@@ -115,7 +110,6 @@ class ValuePoseNet(nn.Module):
 
     def forward_pose(self, waypoint_traj, init_pose, init_vel=None):
         assert init_pose is not None, "init_pose should be included"
-        # import pdb; pdb.set_trace()
         waypoint_traj = waypoint_traj.reshape(-1, self.traj_size)
         if self.hide_toe: # hide 10, 11
             init_pose[:,[4, 8]] = 0
@@ -149,7 +143,6 @@ class ValuePoseNet(nn.Module):
         return value
 
     def calc_embodied_motion_loss(self, pred_traj, init_pose=None, init_vel=None):
-        # import pdb; pdb.set_trace()
         if self.normalize:
             pred_traj, init_pose, init_vel = self._rotate_normalization(pred_traj, init_pose, init_vel)
         pred_value = self.net_forward(pred_traj, init_pose, init_vel)
@@ -176,7 +169,6 @@ class ValuePoseNet(nn.Module):
         for i, edge in enumerate(self.smpl_skeleton):
             ax.plot(init_pose[0,edge,0], init_pose[0,edge,1], init_pose[0,edge,2], c='r', linewidth=1.5)
         if before_pose is not None:
-            import pdb; pdb.set_trace()
             for t, pose in enumerate(before_pose):
                 if np.isnan(pose).any():
                     continue

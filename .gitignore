@@ -67,6 +67,6 @@ isaacgym/python/build/
 isaacgym/python/isaacgym/_bindings/
 isaacgym/python/isaacgym.egg-info/
 
-# Symlinks to plausibl (internal dev working tree)
+# Assets wired in by the user (see README)
 joints2smpl/Pose_to_SMPL/action_dict.json
 social-transmotion/experiments

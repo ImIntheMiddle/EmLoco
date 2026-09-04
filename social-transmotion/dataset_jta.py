@@ -46,7 +46,6 @@ def batch_process_coords(
     training=False,
     multiperson=True,
 ):
-    # import pdb; pdb.set_trace()
     joints = coords.to(config["DEVICE"])
     masks = masks.to(config["DEVICE"])
     # needed_joints = [0] + list(range(3, 27))

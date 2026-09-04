@@ -311,7 +311,6 @@ class Joint:
 
         self.frictionloss = (parse_vec(node.attrib["frictionloss"]) if
                              "frictionloss" in node.attrib else np.array([0]))
-        # import ipdb; ipdb.set_trace()
         # assert np.all(self.pos == body.pos)
 
     def __repr__(self):
@@ -466,7 +465,6 @@ class Joint:
 
         if not get_name:
             self.param_inited = True
-            # import ipdb; ipdb.set_trace()
 
     def set_params(self, params, pad_zeros=False):
         if "axis" in self.param_specs:
@@ -608,7 +606,6 @@ class Geom:
         #     # self.node.attrib["pos"] = " ".join(
         #     #     [f"{x:.6f}".rstrip("0").rstrip(".") for x in self.pos + self.pos_delta]
         #     # )
-        #     import ipdb; ipdb.set_trace()
         #     pass
 
     def get_params(self, param_list, get_name=False, pad_zeros=False):
@@ -1276,10 +1273,8 @@ class Robot:
         ## Clear up beta for smpl and smplh
         if self.smpl_model == "smpl" and self.beta.shape[1] == 16:
             self.beta = self.beta[:, :10]
-            # print(f"Incorrect shape size for {self.model}!!!")
         elif self.smpl_model == "smplh" and self.beta.shape[1] == 10:
             self.beta = torch.hstack([self.beta, torch.zeros((1, 6)).float()])
-            # print(f"Incorrect shape size for {self.model}!!!")
 
         # self.remove_geoms()
         size_dict = {}
@@ -1394,7 +1389,6 @@ class Robot:
                     joint_range = update_joint_limits(joint_range)
 
 
-            # print("enforcing symmetry")
             # for k, v in joint_offsets.items():
             #     if k.startswith("L_"):
             #         right_val = joint_offsets[k.replace("L_", "R_")].copy()
@@ -2136,7 +2130,6 @@ class Robot:
         for elem in remove_elements:
             node = tree.getroot().find(elem)
             if node is None:
-                # print(f"has no elem: {elem}")
                 pass
             else:
                 node.getparent().remove(node)
@@ -2210,7 +2203,7 @@ class Robot:
                 {
                     "name": "cone",
                     "file":
-                    "/hdd/zen/dev/copycat/Copycat/assets/mujoco_models/common/cone.stl",
+                    "pacer/data/assets/mjcf/cone.stl",
                     "scale": "0.025 0.025 0.04",
                 },
             )
@@ -2243,7 +2236,6 @@ class Robot:
         for elem in remove_elements:
             node = tree.getroot().find(elem)
             if node is None:
-                # print(f"has no elem: {elem}")
                 pass
             else:
                 node.getparent().remove(node)

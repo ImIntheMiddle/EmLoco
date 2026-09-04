@@ -4,7 +4,6 @@ import os
 sys.path.append(
     os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "pacer", "pacer")
 )
-import os
 import argparse
 import tqdm
 import matplotlib.pyplot as plt
@@ -52,18 +51,15 @@ class CompareVis_3D(Visualizer_3D):
 
 def main(data, save_dir, frame_num):
     # create visualizer
-    # import pdb; pdb.set_trace()
     vis = CompareVis_3D(save_dir=save_dir)
     names = [d[0] for d in data]
     # compare the data
     bar = tqdm.tqdm(data[0][1]["data"], desc="Comparing data", dynamic_ncols=True)
     # bar = tqdm.tqdm(data[2][1]['data'], desc="Comparing data", dynamic_ncols=True)
-    # import pdb; pdb.set_trace()
     vis_dict = {}
     for id, sample in enumerate(bar):
         gt_xy = sample[0]
         # if trajectory is too short, skip
-        # import pdb; pdb.set_trace()
         if (abs(gt_xy[-1]) > 1).sum() == 0:
             continue
         # add gaussian noise to the ground truth
@@ -101,7 +97,6 @@ def main(data, save_dir, frame_num):
     with open(os.path.join(save_dir, "vis_dict.pkl"), "wb") as f:
         pickle.dump(vis_dict, f)
     # sort by ades
-    # import pdb; pdb.set_trace()
 
 
 def use_vis_dict(data, save_dir, frame_num, picked_sample=[]):
@@ -109,7 +104,6 @@ def use_vis_dict(data, save_dir, frame_num, picked_sample=[]):
     names = [d[0] for d in data]
     initial_iter = True if len(picked_sample) == 0 else False
     # open pre-saved vis_dict
-    # import pdb; pdb.set_trace()
     vis_dict = pickle.load(open(os.path.join(save_dir, "vis_dict.pkl"), "rb"))
     bar = tqdm.tqdm(vis_dict.keys(), desc="Comparing data", dynamic_ncols=True)
     for id in bar:
@@ -124,7 +118,6 @@ def use_vis_dict(data, save_dir, frame_num, picked_sample=[]):
         ades = vis_dict[id]["ades"]
         values = vis_dict[id]["values"]
 
-        # import pdb; pdb.set_trace()
         if ades[0] > ades[1]:
             vis.save_plot(
                 gt_xy,
@@ -198,7 +191,6 @@ if __name__ == "__main__":
                 )
 
         save_dir = os.path.join(args.base_dict, args.save_name, f"{frame_num}frame")
-        # import pdb; pdb.set_trace()
         if args.use_vis_dict:
             picked_sample = use_vis_dict(
                 data, save_dir, frame_num, picked_sample=picked_sample

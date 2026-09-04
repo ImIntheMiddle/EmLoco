@@ -112,7 +112,6 @@ class HumanoidTraj(humanoid_amp_task.HumanoidAMPTask):
         episode_dur = self.max_episode_length * self.dt
         num_verts = 101
         dtheta_max = 2.0
-        # import pdb; pdb.set_trace()
         self._traj_gen = traj_generator.TrajGenerator(num_envs, episode_dur, num_verts,
                                                       self.device, dtheta_max,
                                                       self._speed_min, self._speed_max,
@@ -157,7 +156,6 @@ class HumanoidTraj(humanoid_amp_task.HumanoidAMPTask):
         root_vel = self._humanoid_root_states[env_ids, 7:10]
         self._traj_gen.reset(env_ids, root_pos)
         self.inverted = self._traj_gen.show_inverted()
-        import pdb; pdb.set_trace()
         self.waypoint_traj[env_ids] = self._fetch_traj_samples(env_ids)
         return
 
@@ -166,7 +164,6 @@ class HumanoidTraj(humanoid_amp_task.HumanoidAMPTask):
             root_states = self._humanoid_root_states
         else:
             root_states = self._humanoid_root_states[env_ids]
-        # import pdb; pdb.set_trace()
         traj_samples = self._fetch_traj_samples(env_ids)
         obs = compute_location_observations(root_states, traj_samples)
 
@@ -207,7 +204,6 @@ class HumanoidTraj(humanoid_amp_task.HumanoidAMPTask):
 
     def _fetch_traj_samples(self, env_ids=None):
         # 5 seconds with 0.5 second intervals, 10 samples.
-        # import pdb; pdb.set_trace()
         if (env_ids is None):
             env_ids = torch.arange(self.num_envs, device=self.device, dtype=torch.long)
 

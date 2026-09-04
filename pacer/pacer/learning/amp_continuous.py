@@ -168,7 +168,6 @@ class AMPAgent(common_agent.CommonAgent):
         mb_values = self.experience_buffer.tensor_dict['values']
         mb_next_values = self.experience_buffer.tensor_dict['next_values']
 
-        # import pdb; pdb.set_trace()
         mb_rewards = self.experience_buffer.tensor_dict['rewards']
         mb_amp_obs = self.experience_buffer.tensor_dict['amp_obs']
         amp_rewards = self._calc_amp_rewards(mb_amp_obs)
@@ -201,7 +200,6 @@ class AMPAgent(common_agent.CommonAgent):
         return
 
     def pre_epoch(self, epoch_num):
-        # print("freeze running mean/std")
 
         if self.vec_env.env.task.smpl_humanoid:
             humanoid_env = self.vec_env.env.task
@@ -529,7 +527,6 @@ class AMPAgent(common_agent.CommonAgent):
         sym_loss = orig_a.view(B, -1) - flip_a
 
         # sym_loss = sym_loss.norm(dim = -1)
-        # import ipdb; ipdb.set_trace()
         sym_loss = sym_loss.pow(2).mean(dim = -1) * 50
         return {'sym_loss': sym_loss}
 
@@ -799,5 +796,4 @@ class AMPAgent(common_agent.CommonAgent):
 
             disc_pred = disc_pred.detach().cpu().numpy()[0, 0]
             disc_reward = disc_reward.cpu().numpy()[0, 0]
-            # print("disc_pred: ", disc_pred, disc_reward)
         return

@@ -11,10 +11,8 @@ import pickle
 
 def main(args, data, save_dict):
     # create visualizer
-    # import pdb; pdb.set_trace()
     # compare the data
     bar = tqdm.tqdm(data[0][1]['data'], desc="Comparing data", dynamic_ncols=True)
-    # import pdb; pdb.set_trace()
     ade_diffs_base_traj = []
     ade_diffs_base_all = []
     fde_diffs_base_traj = []
@@ -30,7 +28,6 @@ def main(args, data, save_dict):
         ade_diffs_base_all.append(ade_base_all - ade_ours)
         fde_diffs_base_traj.append(fde_base - fde_ours)
         fde_diffs_base_all.append(fde_base_all - fde_ours)
-    # import pdb; pdb.set_trace()
 
     type =['ADE', 'ADE', 'FDE', 'FDE']
     names = ['traj', 'all', 'traj', 'all']
@@ -38,12 +35,11 @@ def main(args, data, save_dict):
         fig = plt.figure()
         plt.hist(diffs, bins=10, alpha=0.8, edgecolor='black')
 
-        mean_value = np.mean(diffs) # 平均値を計算
+        mean_value = np.mean(diffs)
         plt.axvline(mean_value, color='red', linestyle='dashed', linewidth=2, label=f'Mean: {mean_value:.2f}')
         # plt.xlabel(f"Difference in {type[i]}", fontsize=16)
         # plt.ylabel("Frequency", fontsize=16)
         plt.legend(fontsize=16)
-        # 軸のフォントサイズを設定
         plt.tick_params(labelsize=16)
         # plt.text(x=plt.xlim()[0], y=-350, 
         #  s='Worse', fontsize=16, color='black')

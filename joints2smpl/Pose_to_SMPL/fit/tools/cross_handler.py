@@ -13,7 +13,6 @@ def create_dir_not_exist(path):
 def load_Jtr(file_path):
     with open(file_path, 'rb') as f:
         data = pickle.load(f)
-    # import pdb; pdb.set_trace()
     Jtr = np.array(data["Jtr"])
     key_list = data["key_list"]
     return key_list, Jtr
@@ -59,7 +58,6 @@ def cross_detector(args):
         files_bar = tqdm.tqdm(files, leave=False, dynamic_ncols=True)
         for file in files_bar:
             data = dict()
-            # import pdb; pdb.set_trace()
             input_path = os.path.join(root, file)
             files_bar.set_description(f"Processing file: {input_path}, crossed leg: {crossed_counter_leg}/{total_data_num}, crossed shoulder: {crossed_counter_shoulder}/{total_data_num}")
             key_list, Jtr = load_Jtr(input_path) # load pose array of the file

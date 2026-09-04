@@ -32,11 +32,8 @@ class AMPSeptValueBuilder(AMPSeptBuilder):
             task_obs = obs[:, self.self_obs_size:(self.self_obs_size + self.task_obs_size)]
             assert(obs.shape[-1] == self.self_obs_size + self.task_obs_size)
             #### ZL: add CNN here
-            # print("task_obs_size: ", self.task_obs_size)
 
             traj_obs = task_obs[:, :self.task_obs_size_detail['traj']]
-            # print("traj_obs: ", traj_obs.shape)
-            # import pdb; pdb.set_trace()
 
             # task_out = self.eval_task(task_obs) # modified this
             # task_value_out = self._task_value_mlp(task_out) # modified this
@@ -50,9 +47,6 @@ class AMPSeptValueBuilder(AMPSeptBuilder):
             assert ("traj" in task_obs_size_detail and "heightmap" in task_obs_size_detail)
             # mlp_input_shape = task_obs_size_detail['traj'] + task_obs_size_detail['heightmap'] # Traj, heightmap
             mlp_input_shape = task_obs_size_detail['traj'] # Traj
-            # print('traj size: ', task_obs_size_detail['traj'])
-            # print('heightmap size: ', task_obs_size_detail['heightmap'])
-            # print("-> mlp_input_shape: ", mlp_input_shape)
 
             self._task_value_mlp = nn.Sequential()
             mlp_args = {
@@ -69,10 +63,6 @@ class AMPSeptValueBuilder(AMPSeptBuilder):
             mlp_init = self.init_factory.create(**self._task_initializer)
 
             # show the value network
-            # print("Value Network:")
-            # print(self._task_value_mlp)
-            # print("Value Network Parameters:")
-            # print(self._task_value_mlp.parameters())
 
             for m in self._task_value_mlp.modules():
                 if isinstance(m, nn.Linear):

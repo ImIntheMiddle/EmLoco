@@ -72,7 +72,6 @@ def train(smpl_layer, target, logger, writer, device, args, cfg, meters):
             scale * Jtr.index_select(1, index["smpl_index"]),
             target.index_select(1, index["dataset_index"]),
         )
-        # import pdb; pdb.set_trace()
         if epoch != 0 and prev_loss is not None:
             loss_rel_change = rel_change(prev_loss, loss.item())
             if loss_rel_change <= ftol[0]:
@@ -91,10 +90,6 @@ def train(smpl_layer, target, logger, writer, device, args, cfg, meters):
             break
 
         if epoch % cfg.TRAIN.WRITE == 0:
-            # logger.info("Epoch {}, lossPerBatch={:.6f}, scale={:.4f}".format(
-            #         epoch, float(loss),float(scale)))
-            # print("Epoch {}, lossPerBatch={:.6f}, scale={:.4f}".format(
-            #  epoch, float(loss),float(scale)))
             if loss_rel_change is not None:
                 batch_bar.set_description(
                     "loss={:.5f}, scale={:.3f}, rel_change={:.5f}".format(

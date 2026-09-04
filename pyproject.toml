@@ -16,15 +16,14 @@ dependencies = [
     "matplotlib==3.6.3",
     "pillow",
     "scikit-image==0.21.0",
-    "scikit-learn",
     "opencv-python>=4.8.1.78",
     "trimesh==4.10.0",
+    "pyrender",
     "vtk==9.5.2",
     "tqdm",
     "pyyaml",
     "easydict",
     "ipdb",
-    "rich==14.2.0",
     "termcolor",
     "setuptools==69.5.1",
 
@@ -34,7 +33,6 @@ dependencies = [
     "tensorboardx",
     "wandb==0.23.1",
     "progress==1.6.1",
-    "optuna",                # used by hyper-tuning and train_{jrdb,amass}.py
 
     # --- PACER (RL & physics) ---
     "gym>=0.23,<0.26",       # PACER uses the legacy gym API; do not switch to gymnasium
@@ -51,14 +49,6 @@ dependencies = [
     "imageio-ffmpeg",
     "gdown",
     "numpy-stl",
-    "human-body-prior",
-
-    # --- Social-Transmotion ---
-    "pykalman",
-    "six",
-
-    # --- EqMotion ---
-    "seaborn",
 
     # --- SMPL fitting (PACER + joints2smpl/Pose_to_SMPL) ---
     "smplx",
@@ -71,7 +61,7 @@ dependencies = [
 ]
 
 [tool.uv.sources]
-# IsaacGym is bundled in this repo (./isaacgym/), no need to fetch from NVIDIA.
+# IsaacGym Python sources are bundled here; the binaries are installed separately (see README).
 isaacgym = { path = "./isaacgym/python", editable = true }
 # pacer/poselib and social-transmotion/poselib are identical; pick the PACER copy as the editable install.
 poselib = { path = "./pacer/poselib", editable = true }

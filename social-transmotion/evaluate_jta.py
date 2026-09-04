@@ -4,7 +4,6 @@ import os
 sys.path.append(
     os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "pacer", "pacer")
 )
-import os
 import argparse
 import torch
 import random
@@ -44,7 +43,6 @@ def inference(model, config, input_joints, padding_mask, out_len=14, limit_obs=F
                 input_joints[:, :, 0, :2]
                 + torch.randn_like(input_joints[:, :, 0, :2]) * config["NOISY_TRAJ"]
             )
-        # import pdb; pdb.set_trace()
         pred_joints = model(input_joints, padding_mask, limit_obs=limit_obs)
 
     output_joints = pred_joints[:, -out_len:]
@@ -96,10 +94,7 @@ class Visualizer_3D:
         past_len=9,
     ):
         ax = fig.add_subplot(111, projection="3d")
-        ax.view_init(elev=40, azim=-50)  # 正面ver
-        # ax.view_init(elev=30, azim=-150) # 正面ver
-        # 反対
-        # ax.view_init(elev=40, azim=-140) # 背面ver
+        ax.view_init(elev=40, azim=-50)
         ax.set_xlabel("x")
         ax.set_ylabel("y")
         ax.set_zlabel("z")
@@ -125,7 +120,7 @@ class Visualizer_3D:
         z_range = zlim[1] - zlim[0]
         ax.set_box_aspect(
             [x_range, y_range, z_range]
-        )  # x, y, zのアスペクト比を1:1:1に設定
+        )
 
         # plot past trajectory
         if past_len == 1:
@@ -187,9 +182,7 @@ class Visualizer_3D:
         # ax.plot(gt_xy[:,0], gt_xy[:,1], np.zeros(13)-1.5, c='b', label='GT', linewidth=2)
 
         for id, pred in enumerate(pred_xy):  # for predictions of each model
-            # import pdb; pdb.set_trace()
             if id == 0:
-                # 凡例にだけ加える
                 label_i = f"{names[id]}"
                 ax.plot(
                     np.zeros(1),
@@ -393,7 +386,6 @@ def evaluate_ade_fde(
         joints, masks, padding_mask = batch
         padding_mask = padding_mask.to(config["DEVICE"])
         primary_init_pose = joints[:, 0, 8, 3:27, :3]
-        # import pdb; pdb.set_trace()
         in_joints, in_masks, out_joints, out_masks, padding_mask = batch_process_coords(
             joints, masks, padding_mask, config, modality_selection
         )
@@ -469,7 +461,6 @@ def evaluate_ade_fde(
             des_mean = np.zeros(12)
             gt_xy = gt_xy.detach().cpu().numpy()
             num_mode = pred_xys.size(1)
-            # import pdb; pdb.set_trace()
             candidates = []
             pred_values = []
             for p in range(num_mode):
@@ -503,7 +494,6 @@ def evaluate_ade_fde(
                     else pred_angaccel
                 )
 
-                # import pdb; pdb.set_trace()
                 sum_ade = 0
                 des = []
                 for t in range(12):
@@ -529,7 +519,6 @@ def evaluate_ade_fde(
                 if scene_fde > scene_fde_max:
                     scene_fde_max = scene_fde
 
-                # import pdb; pdb.set_trace()
                 des_mean += np.array(des)  # sum of all des for each mode
 
                 # concat origin to trajectory
@@ -547,7 +536,6 @@ def evaluate_ade_fde(
                     and (not torch.isnan(init_pose).any())
                     and (not torch.isnan(pred_traj).any())
                 ):
-                    # import pdb; pdb.set_trace()
                     with torch.no_grad():
                         pred_value, value_loss = valuenet.calc_embodied_motion_loss(
                             pred_traj.unsqueeze(0),
@@ -561,7 +549,6 @@ def evaluate_ade_fde(
                                 init_vel.unsqueeze(0),
                             )
                         )
-                        # import pdb; pdb.set_trace()
                         # valuenet.visualize_pose(init_pose.unsqueeze(0).cpu(), past_xy.unsqueeze(0).cpu(), gt_traj.unsqueeze(0).cpu())
                         pred_value = pred_value.item()
                         pred_value_gt = pred_value_gt.item()
@@ -579,7 +566,6 @@ def evaluate_ade_fde(
                     pred_value, pred_value_gt = None, None
 
             if num_mode > 1 and valuenet is not None:
-                # import pdb; pdb.set_trace()
                 ade_list.extend([c[0] for c in candidates])
                 fde_list.extend([c[1] for c in candidates])
                 id_random = random.randint(0, num_mode - 1)
@@ -627,7 +613,6 @@ def evaluate_ade_fde(
 
             # if visualize and sum_ade > largest_ade/1.5:
             if visualize:
-                # import pdb; pdb.set_trace()
                 pred_xys = pred_xys.detach().cpu().numpy()
                 pred_xys = np.concatenate(
                     (np.zeros((1, pred_xys.shape[1], 2)), pred_xys), axis=0
@@ -658,7 +643,6 @@ def evaluate_ade_fde(
                 if i > 10:
                     break_flag = True
                     break
-            # import pdb; pdb.set_trace()
             ade_batch += sum_ade_mean / num_mode
             fde_batch += scene_fde_mean / num_mode
             des_batch += des_mean / num_mode
@@ -671,7 +655,6 @@ def evaluate_ade_fde(
             break
         batch_id += 1
 
-    # import pdb; pdb.set_trace()
     ade = ade_batch / sample_num if sample_num > 0 else 0
     fde = fde_batch / sample_num if sample_num > 0 else 0
     des = des_batch / sample_num if sample_num > 0 else 0
@@ -727,7 +710,6 @@ def evaluate_ade_fde(
         logger.info(f"ADE of rejected samples: {ade_filtered:.5f}")
         logger.info(f"FDE of rejected samples: {fde_filtered:.5f}")
 
-        # import pdb; pdb.set_trace()
         value_array = np.array(value_list)  # 0 to 1
         ade_array = np.array(ade_list)
         fde_array = np.array(fde_list)
@@ -735,13 +717,8 @@ def evaluate_ade_fde(
         bins = np.arange(0, 1.05, 0.1)  # 0 to 1
         bin_centers = (bins[:-1] + bins[1:]) / 2  # 0.025 to 0.975
 
-        # valueの各ビンごとにade，fdeの平均値を計算
         value_indices = np.digitize(value_array, bins)
-        # カラーマップの正規化
-        # norm = Normalize(vmin=0, vmax=1)  # カラーマップの範囲を0から1に設定
-        # colors = plt.cm.viridis(norm(value_array))  # カラーマップを使って色を作成
 
-        # valueの各ビンごとにade，fdeの平均値を計算
         ade_mean_values = [
             ade_array[value_indices == i].mean()
             if np.any(value_indices == i)
@@ -766,7 +743,6 @@ def evaluate_ade_fde(
         plt.ylabel("ADE", fontsize=14)
         plt.xticks(bins)
         plt.rcParams["font.size"] = 12
-        # y軸の範囲を限定
         plt.ylim(0, 6)
         # bar label
         for i in range(len(bin_centers)):
@@ -819,12 +795,8 @@ def evaluate_ade_fde(
         )
         plt.close()
 
-        # ヒストグラムを作成
-        # import pdb; pdb.set_trace()
         counts, bins = np.histogram(value_array, bins=10, range=(0, 1))
-        # 自然対数でカウントを変換
-        counts_log = np.log10(counts + 1)  # 0の場合はlog10(1)=0
-        # viridisのカラーマップを使って色を作成
+        counts_log = np.log10(counts + 1)
         plt.ylim(0, 4.5)
         plt.bar(
             bin_centers,
@@ -866,7 +838,6 @@ def evaluate_ade_fde(
         )
 
     if args.valueloss:
-        # import pdb; pdb.set_trace()
         logger.info(f"Value:  {np.mean(value_list):.3f}")
         logger.info(f"Value GT: {np.mean(value_gt_list):.3f}")
         logger.info(f"Value Loss: {np.mean(value_loss_list):.3f}")
@@ -880,7 +851,7 @@ if __name__ == "__main__":
         "--split",
         type=str,
         default="test",
-        help="Split to use. one of [train, test, valid]",
+        help="Split to use. one of [train, val, test]",
     )
     parser.add_argument(
         "--metric",

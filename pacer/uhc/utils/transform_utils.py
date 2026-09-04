@@ -148,7 +148,6 @@ def vertizalize_smpl_root(poses, root_vec = [np.pi/2, 0,0]):
     res_root_aa = rotation_matrix_to_angle_axis(res_root_mats_4)
 
     poses[:, :3] = res_root_aa
-    # print(res_root_aa)
     return poses
 
 def vertizalize_smpl_root_and_trans(poses, trans, root_vec = [np.pi/2, 0,0]):
@@ -165,7 +164,6 @@ def vertizalize_smpl_root_and_trans(poses, trans, root_vec = [np.pi/2, 0,0]):
     trans = torch.matmul(apply_mat, trans[:,:, None])
 
     poses[:, :3] = res_root_aa
-    # print(res_root_aa)
     return poses, trans.squeeze()
 
 
@@ -181,7 +179,6 @@ def rotate_smpl_root_and_trans(poses, trans, root_vec = [np.pi/2, 0,0]):
     trans = torch.matmul(apply_mat, trans[:,:, None])
 
     poses[:, :3] = res_root_aa
-    # print(res_root_aa)
     return poses, trans.squeeze()
 
 def rot6d_to_rotmat(x):

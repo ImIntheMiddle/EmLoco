@@ -3,12 +3,12 @@
 Pipeline:
   fit/output/JTA_cross_fixed/jtapose_<split>_part<N>/batch*_params.pkl
         (key format: "part<N>_scene<S>_person<I>_frame<F>", Jtr (N, 24, 3))
-  social-transmotion/data/jta_all_visual_cues/preprocess/{split}/part_<N>.pkl
-        (list[scene] of list[person] of (joints[T,25,4], mask[T,25]))
+  social-transmotion/data/jta_all_visual_cues/preprocess/{split}/part_<N>.pt
+        (list[scene] of list[person] of (joints[T,47,4], mask[T,47]))
         |
         v
   social-transmotion/data/jta_all_visual_cues/preprocess_smpl_cvpr/{split}/part_<N>.pt
-        (list[scene] of list[person] of (joints[T,27,4], mask[T,27]))
+        (list[scene] of list[person] of (joints[T,49,4], mask[T,49]))
           joints[:, :3,  :]  = traj + 2dbb (3 tokens, copied from preprocess)
           joints[:, 3:27, :3]= SMPL Jtr 24 joints (AMP-reordered via SMPL_mapping)
           joints[:, 27:, :]  = remaining tokens (2dpose, etc.) from preprocess
@@ -132,7 +132,7 @@ def save_pose_and_shape(
         assert nan_any == nan_all, "nan_any and nan_all are not equal!"
         if nan_frames == pose_array.shape[0]:
             continue
-        save_dir = f"../../../smplx/transfer_data/motion_data/{dataset}/{split}"
+        save_dir = f"fit/output/smplx_transfer/{dataset}/{split}"
         os.makedirs(save_dir, exist_ok=True)
         with open(os.path.join(save_dir, f"{person_key}.pkl"), "wb") as f:
             pickle.dump(motion_dict, f)

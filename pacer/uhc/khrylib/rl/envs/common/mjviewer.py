@@ -223,8 +223,6 @@ class MjViewer(MjViewerBasic):
         # resolution -= resolution % 16
         # if self.sim._render_context_offscreen is None:
         #     self.sim.render(resolution[0], resolution[1])
-        # # import ipdb
-        # # ipdb.set_trace()
         # offscreen_ctx = self.sim._render_context_offscreen
         # window_ctx = self.sim._render_context_window
         # # Save markers and overlay from offscreen.
@@ -371,7 +369,6 @@ class MjViewer(MjViewerBasic):
             print("You can access the simulator by self.sim")
             import ipdb
 
-            ipdb.set_trace()
         elif key == glfw.KEY_S:  # Slows down simulation.
             self._run_speed /= 2.0
         elif key == glfw.KEY_F:  # Speeds up simulation.

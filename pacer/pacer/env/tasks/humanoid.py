@@ -512,7 +512,6 @@ class Humanoid(BaseTask):
                 self._num_self_obs = 13 + self._dof_obs_size + 28 + 3 * num_key_bodies  # [root_h, root_rot, root_vel, root_ang_vel, dof_pos, dof_vel, key_body_pos]
 
         elif (asset_file == "mjcf/smpl_humanoid.xml"):
-            # import ipdb; ipdb.set_trace()
             self._dof_body_ids = np.arange(1, len(self._body_names))
             self._dof_offsets = np.linspace(0,
                                             len(self._dof_names) * 3,
@@ -1108,7 +1107,6 @@ class Humanoid(BaseTask):
         return obs
 
     def _compute_humanoid_obs(self, env_ids=None):
-        # import pdb; pdb.set_trace()
         if (ENABLE_MAX_COORD_OBS):
             if (env_ids is None):
                 body_pos = self._rigid_body_pos
@@ -1515,9 +1513,6 @@ def compute_humanoid_reset(reset_buf, progress_buf, contact_buf,
         fall_contact = torch.any(fall_contact, dim=-1)
 
         # if fall_contact.any():
-        # print(masked_contact_buf[0, :, 0].nonzero())
-        #     import ipdb
-        #     ipdb.set_trace()
 
 
         body_height = rigid_body_pos[..., 2]
@@ -1539,8 +1534,6 @@ def compute_humanoid_reset(reset_buf, progress_buf, contact_buf,
 
     reset = torch.where(progress_buf >= max_episode_length - 1,
                         torch.ones_like(reset_buf), terminated)
-    # import ipdb
-    # ipdb.set_trace()
 
     return reset, terminated
 

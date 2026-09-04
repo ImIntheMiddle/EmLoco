@@ -100,7 +100,7 @@ params:
     e_clip: 0.2
 
     horizon_length: 32
-    minibatch_size: 2560 # 25600 at dl41
+    minibatch_size: 2560 # scale with numEnvs / GPU memory
     mini_epochs: 6 # 6 default
     actor_coef: 1 # 1 default
     critic_coef: 5 # 5 default
@@ -111,8 +111,8 @@ params:
     amp_obs_demo_buffer_size: 200000 # 200000 default
     amp_replay_buffer_size: 200000 # 200000 default
     amp_replay_keep_prob: 0.01
-    amp_batch_size: 1280 # 12800 at dl41
-    amp_minibatch_size: 2560 # 25600 at dl41
+    amp_batch_size: 1280 # scale with numEnvs / GPU memory
+    amp_minibatch_size: 2560 # scale with numEnvs / GPU memory
     disc_coef: 5 # 5 default
     disc_logit_reg: 0.01
     disc_grad_penalty: 5
@@ -128,15 +128,9 @@ params:
     inversion_penalty_scale: 0.3
 
     player:
-      games_num: 200 # 50000000 default, 100000 at dl41
+      games_num: 200 # 50000000 default
       finetune: True
-      # finetune: False
       plot_val_reward: True
       print_stats: False # not so meaningful
       render: False
-      # valuenet_path: "output/exp/pacer/valuenet_realpath_JTA+JRDB_valuenet_00025000.pth"
-      # valuenet_path: "output/exp/pacer/valuenet_realpath_powerx10_valuenet_00025000.pth"
-      # valuenet_path: "output/exp/pacer/valuenet_realpath_JTA+JRDB_nopose_valuenet_00025000.pth"
-      # valuenet_path: "output/exp/pacer/valuenet_realpath_JTA+JRDB_novel_valuenet_00025000.pth"
-      # valuenet_path: "output/exp/pacer/valuenet_realpath_JTA+JRDBonly_noalign_valuenet_00025000.pth"
       valuenet_path: "output/exp/pacer/valuenet_realpath_JTA+JRDB_valuenet_00025000.pth"

@@ -50,7 +50,6 @@ class CommonPlayer(players.PpoPlayerContinuous):
         if has_masks_func:
             has_masks = self.env.has_action_mask()
 
-        # import pdb; pdb.set_trace()
 
         need_init_rnn = self.is_rnn
         print('n_games', n_games)
@@ -106,7 +105,6 @@ class CommonPlayer(players.PpoPlayerContinuous):
 
                     # dt = time.time() - t_s
                     # dt_acc.append(dt)
-                    # print(1/np.mean(dt_acc))
 
                     all_done_indices = done.nonzero(as_tuple=False)
                     done_indices = all_done_indices[::self.num_agents]

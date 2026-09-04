@@ -1,6 +1,6 @@
 SEED: 0
 TRAIN:
-    batch_size: 20 # 100 on dl41
+    batch_size: 20 # raise it if your GPU has spare memory
     epochs: 150
     num_workers: 3
     input_track_size: 9

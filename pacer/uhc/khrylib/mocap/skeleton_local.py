@@ -163,7 +163,6 @@ class Skeleton:
             self.name2bone[joint] = bone
         for bone in self.bones[1:]:
             parent_name = parents[bone.name]
-            # print(parent_name)
             if parent_name in self.name2bone.keys():
                 bone_p = self.name2bone[parent_name]
                 bone_p.child.append(bone)

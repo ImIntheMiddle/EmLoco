@@ -640,7 +640,6 @@ def vertizalize_smpl_root(poses, root_vec = [np.pi, 0,0]):
     res_root_aa = rotation_matrix_to_angle_axis(res_root_mats_4)
 
     poses[:, :3] = res_root_aa
-    # print(res_root_aa)
     return poses
 
 def rot6d_to_rotmat(x):

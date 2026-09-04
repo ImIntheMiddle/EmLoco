@@ -258,8 +258,6 @@ def run(in_file: str, out_file: str):
         elif gender == "female":
             gender_number = [2]
         else:
-            import ipdb
-            ipdb.set_trace()
             raise Exception("Gender Not Supported!!")
 
         smpl_2_mujoco = [joint_names.index(q) for q in mujoco_joint_names if q in joint_names]
@@ -321,9 +319,7 @@ def run(in_file: str, out_file: str):
     joblib.dump(amass_full_motion_dict, out_file)
     return
 
-# import ipdb
 
-# ipdb.set_trace()
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

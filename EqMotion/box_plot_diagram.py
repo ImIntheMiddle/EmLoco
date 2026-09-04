@@ -15,7 +15,6 @@ def main():
   data = {0.8: [], 0.75: [], 0: []}
 
   for threshold in THRESHOLD:
-    # print('threshold:', threshold)
     nums = []
     medians = []
     first_quartiles = []
@@ -27,7 +26,6 @@ def main():
 
     if per_sample:
       for subset in SUBSET:
-        # print('subset:', subset)
         with open(os.path.join('output', 'eth', 'box_plot', str(threshold), f'{subset}.json'), 'r') as f:
           boxplot_dict = json.load(f)
           print('path:', os.path.join('output', 'eth', 'box_plot', str(threshold), f'{subset}.json'))
@@ -40,7 +38,6 @@ def main():
           maxs.append(boxplot_dict['max_mean'])
           nums.append(num_samples)
 
-      # import pdb; pdb.set_trace()
       # each sample equally contributes to the mean
       data[threshold].append(sum(mins) / sum(nums))
       data[threshold].append(sum(first_quartiles) / sum(nums))
@@ -50,7 +47,6 @@ def main():
 
     if per_subset:
       for subset in SUBSET:
-        # print('subset:', subset)
         with open(os.path.join('output', 'eth', 'box_plot', str(threshold), f'{subset}.json'), 'r') as f:
           boxplot_dict = json.load(f)
           print('path:', os.path.join('output', 'eth', 'box_plot', str(threshold), f'{subset}.json'))
@@ -76,13 +72,11 @@ def main():
   y_labels = [str(y) for y in y_ticks]
   figsize = (7, 2) # height: 4, width: 6
 
-  # 対数軸に変更
   fig, ax = plt.subplots(figsize=figsize, layout='tight')
   bp = ax.boxplot(data.values(), whis=(0, 100), vert=False, tick_labels=x_labels)
   colors=['salmon', 'skyblue', 'palegreen']
   borders = ['red', 'blue', 'green']
 
-  # boxの色を塗りつぶす
   for artist, color, border in zip(bp['boxes'], colors, borders):
     patch = mpatches.PathPatch(artist.get_path(), color=color)
     ax.add_artist(patch)
@@ -99,7 +93,7 @@ def main():
   ax.set_yticks([])
   ax.set_xticklabels(y_labels, fontsize=12)
 
-  ax.legend(x_labels, fontsize=12)# 凡例を設定
+  ax.legend(x_labels, fontsize=12)
 
   plt.savefig('box_plot_diagram_log.png')
   plt.savefig('box_plot_diagram_log.pdf', bbox_inches='tight')

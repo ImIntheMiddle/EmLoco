@@ -1,6 +1,6 @@
 SEED: 0
 TRAIN:
-    batch_size: 200 # 13 at dl41, 
+    batch_size: 200
     epochs: 20
     num_workers: 5
     input_track_size: 9
@@ -34,5 +34,5 @@ MODEL:
     layer_dims: [1024] # list of int: hidden dimensions of interaction module layer dims for grid-based pooling
     latent_dim: 16 # int: latent dimension of encoding hidden dimension during social pooling
 
-    checkpoint: "" ##checkpoint.pth.tar best_val_checkpoint.pth.tar
+    checkpoint: ""
     valuenet_checkpoint: "valuenet_realpath_JTA+JRDB_valuenet_00025000.pth"

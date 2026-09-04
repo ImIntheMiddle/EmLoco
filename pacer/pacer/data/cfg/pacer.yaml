@@ -7,7 +7,7 @@ env:
   terrain_obs_root: "head"
   use_center_height: true
   real_data_mesh: false
-  numEnvs: 1600 # 1600 on dl41
+  numEnvs: 1600
   envSpacing: 0
   episodeLength: 168 # 300 default, 150 for JRDB/JTA
   isFlagrun: False

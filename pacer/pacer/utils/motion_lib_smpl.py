@@ -82,7 +82,6 @@ def fix_trans_height(pose_aa, trans, curr_gender_betas, smpl_parsers):
 def load_motion_with_skeleton(ids, motion_data_list, skeleton_trees, gender_betas, fix_height, smpl_parsers, masterfoot_config, queue, pid):
     # ZL: loading motion with the specified skeleton. Perfoming forward kinematics to get the joint positions
     res = {}
-    # import pdb; pdb.set_trace()
     for f in range(len(motion_data_list)):
         assert (len(ids) == len(motion_data_list))
         curr_id = ids[f] # id for this datasample
@@ -147,7 +146,6 @@ class DeviceCache:
             try:
                 out = getattr(obj, k)
             except:
-                # print("Error for key=", k)
                 continue
 
             if isinstance(out, torch.Tensor):
@@ -166,7 +164,6 @@ class DeviceCache:
                 setattr(self, k, out)
                 num_added += 1
 
-        # print("Total added", num_added)
 
     def __getattr__(self, string):
         out = getattr(self.obj, string)
@@ -266,7 +263,6 @@ class MotionLib():
                 for i in range(0, len(jobs), chunk)]
         job_args = [jobs[i] for i in range(len(jobs))]
 
-        # import pdb; pdb.set_trace()
 
         for i in range(1, len(jobs)):
             worker_args = (*job_args[i], queue, i)
@@ -380,11 +376,9 @@ class MotionLib():
 
     def update_sampling_history(self, env_ids):
         self._sampling_history[self._curr_motion_ids[env_ids]] += 1
-        # print("sampling history: ", self._sampling_history[self._curr_motion_ids])
 
     def update_termination_history(self, termination):
         self._termination_history[self._curr_motion_ids] += termination.cpu()
-        # print("termination history: ", self._termination_history[self._curr_motion_ids])
 
 
     def sample_motions(self, n):
@@ -493,7 +487,6 @@ class MotionLib():
 
         frame_idx0, frame_idx1, blend = self._calc_frame_blend(
             motion_times, motion_len, num_frames, dt)
-        # print("non_interval", frame_idx0, frame_idx1)
         f0l = frame_idx0 + self.length_starts[motion_ids]
         f1l = frame_idx1 + self.length_starts[motion_ids]
 
@@ -563,7 +556,6 @@ class MotionLib():
         }
 
     def get_root_pos_smpl(self, motion_ids, motion_times):
-        # import pdb; pdb.set_trace()
         n = len(motion_ids)
         num_bodies = self._get_num_bodies()
         num_key_bodies = self._key_body_ids.shape[0]
@@ -574,7 +566,6 @@ class MotionLib():
 
         frame_idx0, frame_idx1, blend = self._calc_frame_blend(
             motion_times, motion_len, num_frames, dt)
-        # print("non_interval", frame_idx0, frame_idx1)
         f0l = frame_idx0 + self.length_starts[motion_ids]
         f1l = frame_idx1 + self.length_starts[motion_ids]
 

@@ -141,8 +141,6 @@ class AMPSeptCNNBuilder(AMPBuilder):
             # self._task_cnn['convs'][0]['padding'] = 1; self._task_cnn['convs'][1]['padding'] = 1; self._task_cnn['convs'][2]['padding'] = 1
             # self._task_actor_cnn = self._build_conv(**cnn_args)
             # test_input = torch.zeros([128, 1, 32, 32])
-            # import ipdb
-            # ipdb.set_trace()
             # self._task_actor_cnn(test_input)
 
 

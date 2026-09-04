@@ -66,7 +66,6 @@ class ModelAMPContinuous(ModelA2CContinuousLogStd):
                 assert (F / steps == 205 or F / steps == 254 or F / steps == 242 or F / steps == 206 or F / steps == 197 or F / steps == 188 or F / steps == 187 or F / steps == 195 or F / steps == 196 or F / steps == 207)
             except:
                 print(F/steps)
-                import ipdb; ipdb.set_trace()
                 print(F/steps)
 
             dof_joints_offset = 12  # 6 + 3 + 3

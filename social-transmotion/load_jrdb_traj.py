@@ -4,7 +4,6 @@ sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "
 import argparse
 from datetime import datetime
 import numpy as np
-import os
 import random
 import time
 import torch
@@ -49,7 +48,6 @@ def save_trajs(config, logger, dataset_name, dataloader, in_F, split='train', f_
     traj_dict = {}
     traj_phase = np.array([0.0000, 0.0707, 0.1414, 0.2122, 0.2829, 0.3536, 0.4243, 0.4950, 0.5658, 0.6365, 0.7072, 0.7779, 0.8487]) * 100
 
-    # import pdb; pdb.set_trace()
     for id in tqdm.tqdm(range(num_trajs)):
         try:
             joints, masks, padding_mask, idxs_list = next(dataiter)
@@ -59,7 +57,6 @@ def save_trajs(config, logger, dataset_name, dataloader, in_F, split='train', f_
 
         # in_joints, _, out_joints, _, _ = batch_process_coords(joints, masks, padding_mask, config, training=False)
 
-        # import pdb; pdb.set_trace()
 
         primary_init_pose = f_init_pose(joints)
         nan_mask_pose = torch.isnan(primary_init_pose).any(dim=1).any(dim=1)
@@ -68,7 +65,6 @@ def save_trajs(config, logger, dataset_name, dataloader, in_F, split='train', f_
         nan_mask_traj = torch.isnan(traj).any()
 
         if not nan_mask_traj.any():
-            # import pdb; pdb.set_trace()
             # interpolate the trajectory
             scene_data = traj.squeeze().numpy()[:13]
             natural = CubicSpline(traj_phase, scene_data, axis=0, bc_type='natural')
